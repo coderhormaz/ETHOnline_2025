@@ -24,7 +24,8 @@ const PaymentLink = lazy(() => import('./pages/PaymentLink').then(m => ({ defaul
 function AppContent() {
   const location = useLocation();
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const showMobileNav = !['/home', '/', '/signup'].includes(location.pathname);
+  const showMobileNav = !['/home', '/', '/signup'].includes(location.pathname) && 
+                        !location.pathname.startsWith('/pay/');
 
   useEffect(() => {
     // Check if user needs onboarding after first login

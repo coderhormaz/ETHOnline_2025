@@ -5,8 +5,31 @@ import { Wallet, CheckCircle2, Loader2, ExternalLink, Copy, AlertCircle } from '
 import { fadeIn, slideUp } from '../lib/animations';
 import { useToast } from '../components/Toast';
 import Confetti from 'react-confetti';
+import { ethers } from 'ethers';
 
-// Mock Web3 integration - replace with actual Web3 logic
+// PYUSD contract address on Arbitrum
+const PYUSD_CONTRACT_ADDRESS = '0x35e050d3c0ec2d29d269a8ecea763a183bdf9a9d';
+
+// ERC20 ABI for transfer function
+const ERC20_ABI = [
+  'function transfer(address to, uint256 amount) returns (bool)',
+  'function balanceOf(address account) view returns (uint256)',
+  'function decimals() view returns (uint8)'
+];
+
+// Arbitrum network config
+const ARBITRUM_NETWORK = {
+  chainId: '0xa4b1', // 42161 in hex
+  chainName: 'Arbitrum One',
+  nativeCurrency: {
+    name: 'Ethereum',
+    symbol: 'ETH',
+    decimals: 18
+  },
+  rpcUrls: ['https://arb1.arbitrum.io/rpc'],
+  blockExplorerUrls: ['https://arbiscan.io']
+};
+
 declare global {
   interface Window {
     ethereum?: any;
@@ -72,17 +95,51 @@ export function PaymentLink() {
   const connectWallet = async () => {
     if (!window.ethereum) {
       showToast('Please install MetaMask or another Web3 wallet', 'error');
+      window.open('https://metamask.io/download/', '_blank');
       return;
     }
 
     setConnecting(true);
     try {
+      // Request account access
       const accounts = await window.ethereum.request({ 
         method: 'eth_requestAccounts' 
       });
       
       if (accounts.length > 0) {
         setWalletAddress(accounts[0]);
+        
+        // Check if on Arbitrum network
+        const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+        
+        if (chainId !== ARBITRUM_NETWORK.chainId) {
+          // Try to switch to Arbitrum
+          try {
+            await window.ethereum.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: ARBITRUM_NETWORK.chainId }],
+            });
+          } catch (switchError: any) {
+            // This error code indicates that the chain has not been added to MetaMask
+            if (switchError.code === 4902) {
+              try {
+                await window.ethereum.request({
+                  method: 'wallet_addEthereumChain',
+                  params: [ARBITRUM_NETWORK],
+                });
+              } catch (addError) {
+                showToast('Failed to add Arbitrum network', 'error');
+                setConnecting(false);
+                return;
+              }
+            } else {
+              showToast('Please switch to Arbitrum network', 'error');
+              setConnecting(false);
+              return;
+            }
+          }
+        }
+        
         setWalletConnected(true);
         showToast('Wallet connected successfully!', 'success');
       }
@@ -95,36 +152,74 @@ export function PaymentLink() {
   };
 
   const handlePayment = async () => {
-    if (!walletConnected || !paymentRequest) return;
+    if (!walletConnected || !paymentRequest || !window.ethereum) return;
 
     setPaying(true);
     try {
-      // In a real implementation:
-      // 1. Get PYUSD contract address on Arbitrum
-      // 2. Create transfer transaction
-      // 3. Send transaction via Web3
-      // 4. Wait for confirmation
-      // 5. Update backend with transaction hash
-
-      // Mock transaction for demo
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create ethers provider and signer
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
       
-      const mockTxHash = '0x' + Math.random().toString(16).substring(2, 66);
+      // Create contract instance
+      const pyusdContract = new ethers.Contract(
+        PYUSD_CONTRACT_ADDRESS,
+        ERC20_ABI,
+        signer
+      );
+      
+      // Get decimals (PYUSD has 6 decimals)
+      const decimals = await pyusdContract.decimals();
+      
+      // Convert amount to proper units (e.g., 100 PYUSD = 100 * 10^6)
+      const amount = ethers.parseUnits(paymentRequest.amount, decimals);
+      
+      // Check balance
+      const balance = await pyusdContract.balanceOf(walletAddress);
+      if (balance < amount) {
+        showToast('Insufficient PYUSD balance', 'error');
+        setPaying(false);
+        return;
+      }
+      
+      showToast('Please confirm the transaction in your wallet...', 'info');
+      
+      // Execute transfer - this will trigger wallet signature window
+      const tx = await pyusdContract.transfer(
+        paymentRequest.publicAddress,
+        amount
+      );
+      
+      showToast('Transaction sent! Waiting for confirmation...', 'info');
+      
+      // Wait for transaction to be mined
+      const receipt = await tx.wait();
       
       // Update payment request status
       const updatedRequest = {
         ...paymentRequest,
         paid: true,
-        txHash: mockTxHash
+        txHash: receipt.hash,
+        paidBy: walletAddress,
+        paidAt: new Date().toISOString()
       };
       localStorage.setItem(`payment_link_${linkId}`, JSON.stringify(updatedRequest));
       
-      setTxHash(mockTxHash);
+      setTxHash(receipt.hash);
       setSuccess(true);
       showToast('Payment sent successfully!', 'success');
     } catch (error: any) {
       console.error('Payment failed:', error);
-      showToast(error.message || 'Payment failed', 'error');
+      
+      let errorMessage = 'Payment failed';
+      if (error.code === 'ACTION_REJECTED') {
+        errorMessage = 'Transaction rejected by user';
+      } else if (error.code === 'INSUFFICIENT_FUNDS') {
+        errorMessage = 'Insufficient ETH for gas fees';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      showToast(errorMessage, 'error');
     } finally {
       setPaying(false);
     }
