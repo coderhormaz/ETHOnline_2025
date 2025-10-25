@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Wallet, CheckCircle2, Loader2, ExternalLink, Copy, AlertCircle } from 'lucide-react';
+import { Wallet, CheckCircle2, Loader2, ExternalLink, Copy, AlertCircle, Clock, XCircle } from 'lucide-react';
 import { fadeIn, slideUp } from '../lib/animations';
 import { useToast } from '../components/Toast';
 import Confetti from 'react-confetti';
 import { ethers } from 'ethers';
+import { getPaymentLink, markPaymentLinkPaid } from '../services/paymentLinks';
+import type { PaymentLink as PaymentLinkType } from '../services/paymentLinks';
 
 // PYUSD contract address on Arbitrum
 const PYUSD_CONTRACT_ADDRESS = '0x35e050d3c0ec2d29d269a8ecea763a183bdf9a9d';
@@ -36,24 +38,14 @@ declare global {
   }
 }
 
-interface PaymentRequest {
-  id: string;
-  handle: string;
-  publicAddress: string;
-  amount: string;
-  note?: string;
-  createdAt: string;
-  paid: boolean;
-  txHash?: string;
-}
-
 export function PaymentLink() {
   const { linkId } = useParams<{ linkId: string }>();
   const navigate = useNavigate();
   const { showToast, ToastContainer } = useToast();
   
   const [loading, setLoading] = useState(true);
-  const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
+  const [paymentRequest, setPaymentRequest] = useState<PaymentLinkType | null>(null);
+  const [error, setError] = useState('');
   const [connecting, setConnecting] = useState(false);
   const [walletConnected, setWalletConnected] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
@@ -65,31 +57,52 @@ export function PaymentLink() {
   // Load payment request details
   useEffect(() => {
     const loadPaymentRequest = async () => {
+      if (!linkId) {
+        setError('Invalid payment link');
+        setLoading(false);
+        return;
+      }
+
       try {
-        // In a real app, fetch from backend using linkId
-        // For now, decode from URL params
-        const data = localStorage.getItem(`payment_link_${linkId}`);
-        if (data) {
-          const request = JSON.parse(data);
-          setPaymentRequest(request);
-          if (request.paid) {
-            setSuccess(true);
-            setTxHash(request.txHash || '');
-          }
-        } else {
-          showToast('Payment link not found', 'error');
+        const result = await getPaymentLink(linkId);
+        
+        if (!result.success || !result.data) {
+          setError(result.error || 'Payment link not found');
+          setLoading(false);
+          return;
+        }
+
+        const link = result.data;
+        
+        // Check if link is active
+        if (!link.is_active) {
+          setError('This payment link has been deactivated');
+          setLoading(false);
+          return;
+        }
+        
+        // Check if max uses exceeded
+        if (link.max_uses && link.current_uses >= link.max_uses) {
+          setError('This payment link has reached its maximum number of uses');
+          setLoading(false);
+          return;
+        }
+
+        setPaymentRequest(link);
+        
+        if (link.paid) {
+          setSuccess(true);
+          setTxHash(link.tx_hash || '');
         }
       } catch (error) {
         console.error('Failed to load payment request:', error);
-        showToast('Failed to load payment request', 'error');
+        setError('Failed to load payment request');
       } finally {
         setLoading(false);
       }
     };
 
-    if (linkId) {
-      loadPaymentRequest();
-    }
+    loadPaymentRequest();
   }, [linkId]);
 
   const connectWallet = async () => {
@@ -185,7 +198,7 @@ export function PaymentLink() {
       
       // Execute transfer - this will trigger wallet signature window
       const tx = await pyusdContract.transfer(
-        paymentRequest.publicAddress,
+        paymentRequest.recipient_address,
         amount
       );
       
@@ -194,15 +207,16 @@ export function PaymentLink() {
       // Wait for transaction to be mined
       const receipt = await tx.wait();
       
-      // Update payment request status
-      const updatedRequest = {
-        ...paymentRequest,
-        paid: true,
-        txHash: receipt.hash,
-        paidBy: walletAddress,
-        paidAt: new Date().toISOString()
-      };
-      localStorage.setItem(`payment_link_${linkId}`, JSON.stringify(updatedRequest));
+      // Update payment request status in Supabase
+      const updateResult = await markPaymentLinkPaid(
+        linkId!,
+        receipt.hash,
+        walletAddress
+      );
+      
+      if (!updateResult.success) {
+        throw new Error(updateResult.error || 'Failed to update payment status');
+      }
       
       setTxHash(receipt.hash);
       setSuccess(true);
@@ -226,8 +240,8 @@ export function PaymentLink() {
   };
 
   const copyAddress = () => {
-    if (paymentRequest?.publicAddress) {
-      navigator.clipboard.writeText(paymentRequest.publicAddress);
+    if (paymentRequest?.recipient_address) {
+      navigator.clipboard.writeText(paymentRequest.recipient_address);
       setCopiedAddress(true);
       showToast('Address copied!', 'success');
       setTimeout(() => setCopiedAddress(false), 2000);
@@ -245,21 +259,74 @@ export function PaymentLink() {
   if (!paymentRequest) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <div className="text-center">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            Payment Link Not Found
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            This payment link is invalid or has expired.
-          </p>
+        <ToastContainer />
+        <div className="text-center max-w-md px-4">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+          >
+            <XCircle className="w-20 h-20 text-red-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+              {error || 'Payment Link Not Found'}
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              This payment link is invalid, has expired, or has already been paid.
+            </p>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if already paid
+  if (paymentRequest.paid && !success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <ToastContainer />
+        <div className="text-center max-w-md px-4">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+          >
+            <CheckCircle2 className="w-20 h-20 text-green-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+              Already Paid
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-2">
+              This payment link has already been paid.
+            </p>
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-4 mt-6">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Amount</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{paymentRequest.amount} PYUSD</p>
+              {paymentRequest.tx_hash && (
+                <>
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-3 mb-1">Transaction</p>
+                  <a
+                    href={`https://arbiscan.io/tx/${paymentRequest.tx_hash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary-600 dark:text-primary-400 hover:underline font-mono break-all"
+                  >
+                    {paymentRequest.tx_hash.substring(0, 20)}...
+                  </a>
+                </>
+              )}
+            </div>
+          </motion.div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div 
+      className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+      style={{
+        background: paymentRequest.color 
+          ? `linear-gradient(to bottom right, ${paymentRequest.color}15, ${paymentRequest.color}05)` 
+          : undefined
+      }}
+    >
       {success && <Confetti recycle={false} numberOfPieces={500} />}
       <ToastContainer />
 
@@ -272,11 +339,18 @@ export function PaymentLink() {
         >
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-primary rounded-full mb-4">
+            <div 
+              className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4"
+              style={{
+                background: paymentRequest.color 
+                  ? `linear-gradient(135deg, ${paymentRequest.color}, ${paymentRequest.color}CC)` 
+                  : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+              }}
+            >
               <Wallet className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Payment Request
+              {paymentRequest.title || 'Payment Request'}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
               Pay with PYUSD on Arbitrum
@@ -301,7 +375,7 @@ export function PaymentLink() {
                       Recipient
                     </p>
                     <p className="text-xl font-bold text-gray-900 dark:text-white font-mono">
-                      {paymentRequest.handle}
+                      {paymentRequest.recipient_handle}
                     </p>
                   </div>
 
@@ -322,6 +396,24 @@ export function PaymentLink() {
                       </p>
                     </div>
                   )}
+                  
+                  {/* Custom Message */}
+                  {paymentRequest.custom_message && (
+                    <div 
+                      className="p-4 rounded-2xl border-2"
+                      style={{
+                        borderColor: paymentRequest.color || '#9333ea',
+                        backgroundColor: `${paymentRequest.color || '#9333ea'}10`
+                      }}
+                    >
+                      <p className="text-sm mb-1" style={{ color: paymentRequest.color || '#9333ea' }}>
+                        Message from {paymentRequest.recipient_handle}
+                      </p>
+                      <p className="text-gray-900 dark:text-white font-medium">
+                        {paymentRequest.custom_message}
+                      </p>
+                    </div>
+                  )}
 
                   {/* Public Address */}
                   <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl">
@@ -337,7 +429,7 @@ export function PaymentLink() {
                       </button>
                     </div>
                     <p className="text-xs font-mono text-gray-700 dark:text-gray-300 break-all">
-                      {paymentRequest.publicAddress}
+                      {paymentRequest.recipient_address}
                     </p>
                   </div>
 
@@ -440,7 +532,7 @@ export function PaymentLink() {
                   Payment Successful! 🎉
                 </h3>
                 <p className="text-gray-600 dark:text-gray-400 mb-8">
-                  {paymentRequest.amount} PYUSD sent to {paymentRequest.handle}
+                  {paymentRequest.amount} PYUSD sent to {paymentRequest.recipient_handle}
                 </p>
 
                 {/* Transaction Details */}

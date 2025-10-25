@@ -20,6 +20,7 @@ const WalletOverview = lazy(() => import('./pages/WalletOverview').then(m => ({ 
 const Profile = lazy(() => import('./pages/Profile').then(m => ({ default: m.Profile })));
 const Security = lazy(() => import('./pages/Security').then(m => ({ default: m.Security })));
 const PaymentLink = lazy(() => import('./pages/PaymentLink').then(m => ({ default: m.PaymentLink })));
+const PaymentLinks = lazy(() => import('./pages/PaymentLinks').then(m => ({ default: m.default })));
 
 function AppContent() {
   const location = useLocation();
@@ -100,6 +101,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <Security />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/payment-links"
+            element={
+              <ProtectedRoute>
+                <PaymentLinks />
               </ProtectedRoute>
             }
           />

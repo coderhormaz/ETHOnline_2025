@@ -1,25 +1,28 @@
 import { motion } from 'framer-motion';
 import QRCode from 'react-qr-code';
-import { ArrowLeft, Copy, CheckCircle, Download, Share2, Link as LinkIcon, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Copy, CheckCircle, Download, Share2, Link as LinkIcon, ExternalLink, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { useWallet } from '../contexts/WalletContext';
 import { PageLoader } from '../components/LoadingStates';
 import { MobileNavSpacer } from '../components/MobileNav';
 import { fadeIn, slideUp } from '../lib/animations';
 import { useToast } from '../components/Toast';
+import { createPaymentLink, type CreatePaymentLinkData } from '../services/paymentLinks';
+import { PaymentLinkEditor } from '../components/PaymentLinkEditor';
 
 export function Receive() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { walletData, loading } = useWallet();
   const [copied, setCopied] = useState(false);
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
   const { showToast, ToastContainer } = useToast();
   
-  // Payment link generation
-  const [linkAmount, setLinkAmount] = useState('');
-  const [linkNote, setLinkNote] = useState('');
+  // Payment link editor
+  const [showEditor, setShowEditor] = useState(false);
   const [generatedLink, setGeneratedLink] = useState('');
   const [copiedLink, setCopiedLink] = useState(false);
 
@@ -48,30 +51,26 @@ export function Receive() {
     return walletData.handle;
   };
 
-  const generatePaymentLink = () => {
-    if (!walletData || !linkAmount || parseFloat(linkAmount) <= 0) {
-      showToast('Please enter a valid amount', 'error');
+  const generatePaymentLink = async (data: CreatePaymentLinkData) => {
+    if (!user || !walletData) {
+      showToast('User or wallet data not available', 'error');
       return;
     }
 
-    // Create unique link ID
-    const linkId = Date.now().toString(36) + Math.random().toString(36).substring(2);
-    
-    // Store payment request data
-    const paymentRequest = {
-      id: linkId,
-      handle: walletData.handle,
-      publicAddress: walletData.publicAddress,
-      amount: linkAmount,
-      note: linkNote || undefined,
-      createdAt: new Date().toISOString(),
-      paid: false
-    };
-    
-    localStorage.setItem(`payment_link_${linkId}`, JSON.stringify(paymentRequest));
-    
+    const result = await createPaymentLink(
+      user.id,
+      walletData.handle,
+      walletData.publicAddress,
+      data
+    );
+
+    if (!result.success || !result.linkId) {
+      showToast(result.error || 'Failed to create payment link', 'error');
+      throw new Error(result.error);
+    }
+
     // Generate link
-    const link = `${window.location.origin}/pay/${linkId}`;
+    const link = `${window.location.origin}/pay/${result.linkId}`;
     setGeneratedLink(link);
     showToast('Payment link generated!', 'success');
   };
@@ -92,7 +91,7 @@ export function Receive() {
       try {
         await navigator.share({
           title: 'Payment Request',
-          text: `Pay ${linkAmount} PYUSD to ${walletData?.handle}`,
+          text: `Pay with PYUSD to ${walletData?.handle}`,
           url: generatedLink
         });
       } catch (error) {
@@ -294,108 +293,102 @@ export function Receive() {
               </div>
             </div>
 
-            <div className="space-y-4 mb-6">
-              <div>
-                <label htmlFor="link-amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Amount (PYUSD) <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="link-amount"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
-                  value={linkAmount}
-                  onChange={(e) => setLinkAmount(e.target.value)}
-                  placeholder="Enter amount"
-                  className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-all text-base"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="link-note" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Payment Note (Optional)
-                </label>
-                <input
-                  id="link-note"
-                  type="text"
-                  value={linkNote}
-                  onChange={(e) => setLinkNote(e.target.value)}
-                  placeholder="What's this payment for?"
-                  maxLength={100}
-                  className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition-all text-base"
-                />
-              </div>
-            </div>
-
             <motion.button
-              onClick={generatePaymentLink}
+              onClick={() => setShowEditor(true)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="w-full bg-gradient-to-r from-accent-500 to-purple-600 text-white font-semibold py-4 rounded-2xl hover:shadow-glow transition-all flex items-center justify-center gap-2 mb-4"
             >
-              <LinkIcon className="w-5 h-5" />
-              Generate Payment Link
+              <Plus className="w-5 h-5" />
+              Create Payment Link
             </motion.button>
-
-            {generatedLink && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-4"
+            
+            <div className="text-center">
+              <button
+                onClick={() => navigate('/payment-links')}
+                className="text-sm text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 flex items-center gap-1 mx-auto"
               >
-                <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-200 dark:border-green-800 rounded-2xl">
-                  <p className="text-sm font-semibold text-green-900 dark:text-green-100 mb-2">
-                    ✓ Payment Link Generated
-                  </p>
-                  <div className="bg-white dark:bg-gray-800 rounded-xl p-3 mb-3">
-                    <p className="text-xs font-mono text-gray-700 dark:text-gray-300 break-all">
-                      {generatedLink}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <motion.button
-                      onClick={copyPaymentLink}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors border border-gray-300 dark:border-gray-600"
-                    >
-                      {copiedLink ? (
-                        <>
-                          <CheckCircle className="w-4 h-4 text-green-500" />
-                          Copied!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-4 h-4" />
-                          Copy Link
-                        </>
-                      )}
-                    </motion.button>
-                    <motion.button
-                      onClick={sharePaymentLink}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-primary text-white font-medium rounded-xl hover:shadow-lg transition-all"
-                    >
-                      <Share2 className="w-4 h-4" />
-                      Share
-                    </motion.button>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl">
-                  <p className="text-sm text-blue-900 dark:text-blue-100 leading-relaxed">
-                    <strong>💡 How it works:</strong> Share this link with anyone. They can pay you using MetaMask, OKX, or any Web3 wallet on Arbitrum - no app login required!
-                  </p>
-                </div>
-              </motion.div>
-            )}
+                <LinkIcon className="w-4 h-4" />
+                View all payment links
+              </button>
+            </div>
           </motion.div>
         </motion.div>
       </div>
       
       {/* Mobile Navigation Spacer */}
       <MobileNavSpacer />
+      
+      {/* Payment Link Editor Modal */}
+      <PaymentLinkEditor
+        isOpen={showEditor}
+        onClose={() => {
+          setShowEditor(false);
+          setGeneratedLink('');
+        }}
+        onSave={generatePaymentLink}
+      />
+      
+      {/* Generated Link Modal */}
+      {generatedLink && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setGeneratedLink('')}
+        >
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-md w-full p-6"
+          >
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full mb-4">
+                <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                Payment Link Created!
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Share this link to receive payments
+              </p>
+            </div>
+            
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-2xl p-4 mb-4">
+              <p className="text-xs font-mono text-gray-700 dark:text-gray-300 break-all">
+                {generatedLink}
+              </p>
+            </div>
+            
+            <div className="flex gap-2">
+              <button
+                onClick={copyPaymentLink}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-medium rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              >
+                {copiedLink ? (
+                  <>
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    Copy Link
+                  </>
+                )}
+              </button>
+              <button
+                onClick={sharePaymentLink}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all"
+              >
+                <Share2 className="w-4 h-4" />
+                Share
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }
