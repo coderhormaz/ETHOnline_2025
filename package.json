@@ -10,11 +10,24 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.76.1",
+    "autoprefixer": "^10.4.21",
+    "crypto-js": "^4.2.0",
+    "ethers": "^6.15.0",
+    "framer-motion": "^12.23.24",
+    "html5-qrcode": "^2.3.8",
+    "lucide-react": "^0.548.0",
+    "postcss": "^8.5.6",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-confetti": "^6.4.0",
+    "react-dom": "^19.1.1",
+    "react-qr-code": "^2.0.18",
+    "react-router-dom": "^7.9.4",
+    "tailwindcss": "3.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^24.6.0",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",

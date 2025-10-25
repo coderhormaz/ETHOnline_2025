@@ -1,0 +1,143 @@
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { ArrowLeft, ArrowUpRight, ArrowDownLeft, ExternalLink, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { getTransactionHistory, type TransactionWithDetails } from '../services/transactions';
+import { getExplorerUrl } from '../lib/blockchain/pyusd';
+import { fadeIn, slideUp } from '../lib/animations';
+
+export function Transactions() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [transactions, setTransactions] = useState<TransactionWithDetails[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (!user) return;
+
+      try {
+        const history = await getTransactionHistory(user.id);
+        setTransactions(history);
+      } catch (error) {
+        console.error('Error fetching transactions:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, [user]);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      {/* Header */}
+      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Transaction History
+            </h1>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+          </div>
+        ) : transactions.length === 0 ? (
+          <motion.div
+            variants={fadeIn}
+            initial="initial"
+            animate="animate"
+            className="text-center py-12"
+          >
+            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+              <ArrowUpRight className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              No transactions yet
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Your payment history will appear here
+            </p>
+          </motion.div>
+        ) : (
+          <div className="space-y-4">
+            {transactions.map((tx, index) => (
+              <motion.div
+                key={tx.id}
+                variants={slideUp}
+                initial="initial"
+                animate="animate"
+                transition={{ delay: index * 0.05 }}
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    {/* Icon */}
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                      tx.from_user_id === user?.id
+                        ? 'bg-red-100 dark:bg-red-900/20'
+                        : 'bg-green-100 dark:bg-green-900/20'
+                    }`}>
+                      {tx.from_user_id === user?.id ? (
+                        <ArrowUpRight className="w-6 h-6 text-red-600 dark:text-red-400" />
+                      ) : (
+                        <ArrowDownLeft className="w-6 h-6 text-green-600 dark:text-green-400" />
+                      )}
+                    </div>
+
+                    {/* Details */}
+                    <div>
+                      <div className="font-semibold text-gray-900 dark:text-white mb-1">
+                        {tx.from_user_id === user?.id ? 'Sent to' : 'Received from'}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        {tx.from_user_id === user?.id ? tx.to_handle : tx.from_handle}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                        {new Date(tx.created_at).toLocaleDateString()} at{' '}
+                        {new Date(tx.created_at).toLocaleTimeString()}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Amount & Link */}
+                  <div className="text-right">
+                    <div className={`text-lg font-bold mb-2 ${
+                      tx.from_user_id === user?.id
+                        ? 'text-red-600 dark:text-red-400'
+                        : 'text-green-600 dark:text-green-400'
+                    }`}>
+                      {tx.from_user_id === user?.id ? '-' : '+'}{tx.amount} PYUSD
+                    </div>
+                    <a
+                      href={getExplorerUrl(tx.tx_hash)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-primary-600 dark:text-primary-400 hover:underline"
+                    >
+                      View
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
