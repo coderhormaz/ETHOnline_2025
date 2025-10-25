@@ -9,14 +9,16 @@ import { PageLoader } from '../components/LoadingStates';
 import { DashboardSkeleton } from '../components/SkeletonLoaders';
 import { MobileNavSpacer } from '../components/MobileNav';
 import { fadeIn, slideUp, staggerContainer } from '../lib/animations';
+import { useToast } from '../components/Toast';
 
 export function Dashboard() {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const { walletData, loading, refreshWallet } = useWallet();
   const navigate = useNavigate();
   const [refreshing, setRefreshing] = useState(false);
   const [displayBalance, setDisplayBalance] = useState(0);
   const balanceControls = useAnimation();
+  const { showToast, ToastContainer } = useToast();
 
   // Animate balance changes
   useEffect(() => {
@@ -81,6 +83,8 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 md:pl-64">
+      <ToastContainer />
+      
       {/* Header */}
       <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">

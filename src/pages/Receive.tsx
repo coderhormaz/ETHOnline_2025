@@ -12,6 +12,8 @@ export function Receive() {
   const navigate = useNavigate();
   const { walletData, loading } = useWallet();
   const [copied, setCopied] = useState(false);
+  const [amount, setAmount] = useState('');
+  const [note, setNote] = useState('');
 
   const copyHandle = () => {
     if (walletData?.handle) {
@@ -19,6 +21,23 @@ export function Receive() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
+  };
+
+  // Generate payment request data for QR code
+  const getQRData = () => {
+    if (!walletData?.handle) return '';
+    
+    // If amount is specified, encode as JSON payment request
+    if (amount && parseFloat(amount) > 0) {
+      return JSON.stringify({
+        handle: walletData.handle,
+        amount: amount,
+        note: note || undefined
+      });
+    }
+    
+    // Otherwise just return handle
+    return walletData.handle;
   };
 
   if (loading) {
@@ -65,16 +84,68 @@ export function Receive() {
             className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl p-8 shadow-premium mb-8"
           >
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-              Scan to Pay
+              {amount ? 'Payment Request' : 'Scan to Pay'}
             </h2>
+
+            {/* Amount Input (Optional) */}
+            <div className="mb-6 space-y-4">
+              <div>
+                <label htmlFor="receive-amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-left">
+                  Request Amount (Optional)
+                </label>
+                <input
+                  id="receive-amount"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="0.00"
+                  className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-base"
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-left">
+                  Leave empty for any amount
+                </p>
+              </div>
+
+              <div>
+                <label htmlFor="receive-note" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-left">
+                  Note (Optional)
+                </label>
+                <input
+                  id="receive-note"
+                  type="text"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="What's this payment for?"
+                  maxLength={50}
+                  className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-base"
+                />
+              </div>
+            </div>
 
             {/* QR Code */}
             <div className="bg-white p-6 rounded-2xl inline-block mb-6">
               <QRCode
-                value={walletData.handle}
+                value={getQRData()}
                 size={256}
               />
             </div>
+
+            {/* Payment Details Display */}
+            {amount && parseFloat(amount) > 0 && (
+              <div className="bg-gradient-to-br from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20 rounded-2xl p-4 mb-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Requesting</p>
+                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                  {amount} PYUSD
+                </p>
+                {note && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    "{note}"
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Handle Display */}
             <div className="bg-gradient-card backdrop-blur-xl rounded-2xl p-6 border border-primary-100 dark:border-primary-900 mb-4">
@@ -101,7 +172,11 @@ export function Receive() {
 
             {/* Instructions */}
             <div className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
-              <p>Share this QR code or your handle to receive PYUSD payments</p>
+              <p>
+                {amount 
+                  ? 'Share this QR code to request a specific amount' 
+                  : 'Share this QR code or your handle to receive PYUSD payments'}
+              </p>
             </div>
           </motion.div>
 

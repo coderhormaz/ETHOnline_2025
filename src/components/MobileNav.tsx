@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Send, QrCode, Clock } from 'lucide-react';
+import { Home, Send, QrCode, Clock, Wallet } from 'lucide-react';
 
 interface NavItem {
   path: string;
@@ -14,6 +14,7 @@ const navItems: NavItem[] = [
   { path: '/send', icon: Send, label: 'Send' },
   { path: '/receive', icon: QrCode, label: 'Receive' },
   { path: '/transactions', icon: Clock, label: 'History' },
+  { path: '/wallet', icon: Wallet, label: 'Wallet' },
 ];
 
 export function MobileNav() {
@@ -26,7 +27,7 @@ export function MobileNav() {
       animate={{ y: 0 }}
       className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 safe-area-bottom"
     >
-      <div className="grid grid-cols-4 gap-1 px-2 py-2">
+      <div className="grid grid-cols-5 gap-1 px-2 py-2">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;

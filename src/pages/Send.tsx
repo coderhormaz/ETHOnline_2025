@@ -24,53 +24,156 @@ export function Send() {
   const [error, setError] = useState('');
   const [showScanner, setShowScanner] = useState(false);
   const [scannerReady, setScannerReady] = useState(false);
+  const [isPaymentRequest, setIsPaymentRequest] = useState(false);
+  const [paymentNote, setPaymentNote] = useState('');
   
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const qrReaderRef = useRef<HTMLDivElement>(null);
 
+  // Add global styles for QR scanner
+  useEffect(() => {
+    // Add styles to make video visible
+    const style = document.createElement('style');
+    style.id = 'qr-scanner-styles';
+    style.innerHTML = `
+      #qr-reader video {
+        width: 100% !important;
+        height: auto !important;
+        display: block !important;
+        border-radius: 1rem;
+      }
+      #qr-reader {
+        border: none !important;
+      }
+      #qr-reader__dashboard_section {
+        display: none !important;
+      }
+      #qr-reader__dashboard_section_swaplink {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      const existingStyle = document.getElementById('qr-scanner-styles');
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+    };
+  }, []);
+
   // Initialize QR Scanner
   useEffect(() => {
-    if (showScanner && qrReaderRef.current) {
+    let isMounted = true;
+    
+    if (showScanner && qrReaderRef.current && !scannerRef.current) {
       const html5QrCode = new Html5Qrcode("qr-reader");
       scannerRef.current = html5QrCode;
       
+      // Request camera permissions and start scanning
       html5QrCode.start(
-        { facingMode: "environment" },
+        { facingMode: "environment" }, // Use back camera on mobile
         {
-          fps: 10,
-          qrbox: { width: 250, height: 250 }
+          fps: 10, // Frames per second for scanning
+          qrbox: undefined, // Scan entire camera view, not just a box
+          aspectRatio: 1.0, // Square aspect ratio
+          disableFlip: false // Allow horizontal flip
         },
         (decodedText) => {
-          // QR code scanned successfully
-          setRecipientHandle(decodedText);
-          stopScanner();
+          // QR code successfully scanned
+          if (isMounted) {
+            console.log('QR Code scanned:', decodedText);
+            
+            // Try to parse as payment request JSON
+            try {
+              const paymentRequest = JSON.parse(decodedText);
+              if (paymentRequest.handle) {
+                setRecipientHandle(paymentRequest.handle);
+                if (paymentRequest.amount) {
+                  setAmount(paymentRequest.amount);
+                  setIsPaymentRequest(true);
+                  if (paymentRequest.note) {
+                    setPaymentNote(paymentRequest.note);
+                  }
+                } else {
+                  setIsPaymentRequest(false);
+                  setPaymentNote('');
+                }
+                setError(''); // Clear any errors
+                stopScanner();
+                return;
+              }
+            } catch (e) {
+              // Not JSON, treat as plain handle
+            }
+            
+            // Fallback: treat as plain handle string
+            setRecipientHandle(decodedText);
+            setIsPaymentRequest(false);
+            setPaymentNote('');
+            setError(''); // Clear any errors
+            stopScanner();
+          }
         },
         (errorMessage) => {
-          // Handle scan errors (mostly from continuous scanning)
-          console.log('Scan error:', errorMessage);
+          // This gets called continuously during scanning, ignore unless critical
+          // Only log if it's not a routine "no QR code found" message
+          if (!errorMessage.includes('NotFoundException')) {
+            console.log('Scan error:', errorMessage);
+          }
         }
       ).then(() => {
-        setScannerReady(true);
+        if (isMounted) {
+          console.log('Scanner started successfully');
+          setScannerReady(true);
+        }
       }).catch((err) => {
-        console.error('Failed to start scanner:', err);
-        setError('Failed to start camera. Please check permissions.');
-        stopScanner();
+        if (isMounted) {
+          console.error('Failed to start scanner:', err);
+          let errorMsg = 'Failed to start camera. ';
+          if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+            errorMsg += 'Please allow camera access in your browser settings.';
+          } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+            errorMsg += 'No camera found on this device.';
+          } else {
+            errorMsg += 'Please check camera permissions.';
+          }
+          setError(errorMsg);
+          setShowScanner(false);
+          setScannerReady(false);
+        }
       });
     }
 
     return () => {
-      stopScanner();
+      isMounted = false;
+      // Only cleanup when component unmounts, not when showScanner changes
     };
   }, [showScanner]);
 
+  // Cleanup scanner on unmount
+  useEffect(() => {
+    return () => {
+      if (scannerRef.current) {
+        const scanner = scannerRef.current;
+        if (scanner.isScanning) {
+          scanner.stop().catch(console.error);
+        }
+      }
+    };
+  }, []);
+
   const stopScanner = () => {
-    if (scannerRef.current && scannerRef.current.isScanning) {
-      scannerRef.current.stop().then(() => {
-        scannerRef.current?.clear();
-        scannerRef.current = null;
-      }).catch((err) => {
-        console.error('Failed to stop scanner:', err);
-      });
+    if (scannerRef.current) {
+      const scanner = scannerRef.current;
+      if (scanner.isScanning) {
+        scanner.stop().then(() => {
+          scanner.clear();
+        }).catch((err) => {
+          console.error('Failed to stop scanner:', err);
+        });
+      }
+      scannerRef.current = null;
     }
     setShowScanner(false);
     setScannerReady(false);
@@ -114,6 +217,8 @@ export function Send() {
     setError('');
     setSuccess(false);
     setTxHash('');
+    setIsPaymentRequest(false);
+    setPaymentNote('');
   };
 
   return (
@@ -193,6 +298,22 @@ export function Send() {
                       Enter the recipient's @handle or scan their QR code
                     </p>
                   </div>
+
+                  {/* Payment Request Info */}
+                  {isPaymentRequest && paymentNote && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4"
+                    >
+                      <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">
+                        📝 Payment Request
+                      </p>
+                      <p className="text-sm text-blue-700 dark:text-blue-300">
+                        {paymentNote}
+                      </p>
+                    </motion.div>
+                  )}
 
                   {/* Amount */}
                   <div>
@@ -365,18 +486,59 @@ export function Send() {
                 </div>
 
                 {/* QR Reader */}
-                <div className="relative rounded-2xl overflow-hidden bg-gray-900">
-                  <div id="qr-reader" ref={qrReaderRef} className="w-full"></div>
+                <div className="relative rounded-2xl overflow-hidden bg-black">
+                  <div 
+                    id="qr-reader" 
+                    ref={qrReaderRef}
+                    style={{ 
+                      width: '100%',
+                      minHeight: '300px',
+                      maxHeight: '400px'
+                    }}
+                  ></div>
+                  
+                  {/* Scanning Guide Overlay */}
+                  {scannerReady && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      {/* Center Guide Box */}
+                      <div className="relative w-64 h-64">
+                        {/* Corner Markers */}
+                        <div className="absolute top-0 left-0 w-8 h-8 border-l-4 border-t-4 border-primary-500"></div>
+                        <div className="absolute top-0 right-0 w-8 h-8 border-r-4 border-t-4 border-primary-500"></div>
+                        <div className="absolute bottom-0 left-0 w-8 h-8 border-l-4 border-b-4 border-primary-500"></div>
+                        <div className="absolute bottom-0 right-0 w-8 h-8 border-r-4 border-b-4 border-primary-500"></div>
+                        
+                        {/* Center Crosshair */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-12 h-12 border-2 border-primary-400 rounded-full animate-pulse opacity-60"></div>
+                        </div>
+                        
+                        {/* Instruction Text */}
+                        <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                          <p className="text-sm font-medium text-white drop-shadow-lg">
+                            Align QR code here
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   {!scannerReady && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 gap-3 z-10">
                       <Loader2 className="w-8 h-8 text-white animate-spin" />
+                      <p className="text-sm text-white/80">Starting camera...</p>
                     </div>
                   )}
                 </div>
 
-                <p className="mt-4 text-xs text-center text-gray-500 dark:text-gray-400">
-                  Make sure to allow camera access when prompted
-                </p>
+                <div className="mt-4 space-y-2">
+                  <p className="text-xs text-center text-gray-600 dark:text-gray-400">
+                    📷 Allow camera access to scan QR codes
+                  </p>
+                  <p className="text-xs text-center text-gray-500 dark:text-gray-500">
+                    Position the QR code in the center of the camera view
+                  </p>
+                </div>
               </motion.div>
             </div>
           </>
