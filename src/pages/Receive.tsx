@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion';
 import QRCode from 'react-qr-code';
-import { ArrowLeft, Copy, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Copy, CheckCircle, Download, Share2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useWallet } from '../contexts/WalletContext';
 import { PageLoader } from '../components/LoadingStates';
+import { MobileNavSpacer } from '../components/MobileNav';
 import { fadeIn, slideUp } from '../lib/animations';
 
 export function Receive() {
@@ -34,12 +35,15 @@ export function Receive() {
       <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-4">
-            <button
+            <motion.button
               onClick={() => navigate('/dashboard')}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="p-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+              aria-label="Back to dashboard"
             >
               <ArrowLeft className="w-5 h-5" />
-            </button>
+            </motion.button>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Receive PYUSD
             </h1>
@@ -79,16 +83,19 @@ export function Receive() {
                 <span className="text-2xl font-bold text-gray-900 dark:text-white font-mono">
                   {walletData.handle}
                 </span>
-                <button
+                <motion.button
                   onClick={copyHandle}
-                  className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                  className="p-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.1 }}
+                  aria-label={copied ? "Handle copied" : "Copy handle to clipboard"}
                 >
                   {copied ? (
                     <CheckCircle className="w-5 h-5 text-green-500" />
                   ) : (
                     <Copy className="w-5 h-5" />
                   )}
-                </button>
+                </motion.button>
               </div>
             </div>
 
@@ -128,6 +135,9 @@ export function Receive() {
           </div>
         </motion.div>
       </div>
+      
+      {/* Mobile Navigation Spacer */}
+      <MobileNavSpacer />
     </div>
   );
 }

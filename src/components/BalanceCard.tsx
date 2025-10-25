@@ -78,22 +78,25 @@ export function BalanceCard({ balance, publicAddress, handle }: BalanceCardProps
           <span className="text-white/60 text-sm font-mono">
             {formatAddress(publicAddress, 6)}
           </span>
-          <button
+          <motion.button
             onClick={copyAddress}
-            className="flex items-center gap-2 text-white/80 hover:text-white transition-colors bg-white/10 hover:bg-white/20 rounded-full px-3 py-1.5"
+            className="flex items-center gap-2 text-white/80 hover:text-white transition-colors bg-white/10 hover:bg-white/20 rounded-full px-4 py-2 min-h-[44px]"
+            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.05 }}
+            aria-label={copied ? "Address copied" : "Copy wallet address"}
           >
             {copied ? (
               <>
-                <CheckCircle className="w-4 h-4" />
+                <CheckCircle className="w-4 h-4" aria-hidden="true" />
                 <span className="text-xs font-medium">Copied!</span>
               </>
             ) : (
               <>
-                <Copy className="w-4 h-4" />
+                <Copy className="w-4 h-4" aria-hidden="true" />
                 <span className="text-xs font-medium">Copy</span>
               </>
             )}
-          </button>
+          </motion.button>
         </motion.div>
       </div>
     </motion.div>

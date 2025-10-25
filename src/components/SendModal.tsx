@@ -93,12 +93,15 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
               {success && <Confetti width={400} height={600} recycle={false} numberOfPieces={200} />}
               
               {/* Close Button */}
-              <button
+              <motion.button
                 onClick={handleClose}
-                className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.1 }}
+                aria-label="Close send payment modal"
               >
                 <X className="w-6 h-6" />
-              </button>
+              </motion.button>
 
               {!success ? (
                 <>
@@ -116,60 +119,83 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
                   <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Recipient Handle */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label htmlFor="recipient-handle" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Recipient Handle
                       </label>
                       <div className="relative">
                         <input
+                          id="recipient-handle"
                           type="text"
                           value={recipientHandle}
                           onChange={(e) => setRecipientHandle(e.target.value)}
                           required
-                          className="w-full px-4 py-3 rounded-2xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                          autoComplete="off"
+                          className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-base"
                           placeholder="username@pyusd"
+                          aria-describedby="recipient-help"
                         />
                       </div>
+                      <p id="recipient-help" className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        Enter the recipient's @handle or wallet address
+                      </p>
                     </div>
 
                     {/* Amount */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Amount (PYUSD)
                       </label>
                       <input
+                        id="amount"
                         type="number"
                         step="0.01"
                         min="0.01"
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                         required
-                        className="w-full px-4 py-3 rounded-2xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                        autoComplete="off"
+                        className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-base"
                         placeholder="0.00"
+                        aria-describedby="amount-help"
                       />
+                      <p id="amount-help" className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        Minimum amount: 0.01 PYUSD
+                      </p>
                     </div>
 
                     {/* Error Message */}
                     {error && (
-                      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4">
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        role="alert"
+                        className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4"
+                      >
                         <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-                      </div>
+                      </motion.div>
                     )}
 
                     {/* Submit Button */}
-                    <button
+                    <motion.button
                       type="submit"
                       disabled={loading}
-                      className="w-full bg-gradient-primary text-white font-semibold py-4 rounded-2xl hover:shadow-glow transform hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className="w-full bg-gradient-primary text-white font-semibold py-4 rounded-2xl hover:shadow-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 min-h-[56px]"
+                      whileTap={{ scale: loading ? 1 : 0.98 }}
+                      whileHover={{ scale: loading ? 1 : 1.02 }}
+                      aria-label="Send PYUSD payment"
                     >
                       {loading ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
+                          <span>Sending...</span>
+                        </>
                       ) : (
                         <>
-                          <Send className="w-5 h-5" />
+                          <Send className="w-5 h-5" aria-hidden="true" />
                           Send Payment
                         </>
                       )}
-                    </button>
+                    </motion.button>
                   </form>
                 </>
               ) : (

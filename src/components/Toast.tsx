@@ -31,19 +31,24 @@ export function Toast({ message, type, onClose, duration = 5000 }: ToastProps) {
 
   return (
     <motion.div
+      role="alert"
+      aria-live="polite"
+      aria-atomic="true"
       initial={{ opacity: 0, y: -50, x: '-50%' }}
       animate={{ opacity: 1, y: 0, x: '-50%' }}
       exit={{ opacity: 0, y: -50, x: '-50%' }}
       className={`fixed top-4 left-1/2 z-50 flex items-center gap-3 px-6 py-4 rounded-2xl border ${bgColors[type]} shadow-premium backdrop-blur-xl`}
     >
-      {icons[type]}
+      <span aria-hidden="true">{icons[type]}</span>
       <p className="text-sm font-medium text-gray-900 dark:text-white">{message}</p>
-      <button
+      <motion.button
         onClick={onClose}
-        className="ml-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+        className="ml-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors p-1 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center"
+        whileTap={{ scale: 0.9 }}
+        aria-label="Close notification"
       >
         <X className="w-4 h-4" />
-      </button>
+      </motion.button>
     </motion.div>
   );
 }

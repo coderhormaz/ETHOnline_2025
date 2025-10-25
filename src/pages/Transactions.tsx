@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowUpRight, ArrowDownLeft, ExternalLink, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, ArrowDownLeft, ExternalLink, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getTransactionHistory, type TransactionWithDetails } from '../services/transactions';
 import { getExplorerUrl } from '../lib/blockchain/pyusd';
 import { fadeIn, slideUp } from '../lib/animations';
+import { EmptyState } from '../components/EmptyState';
+import { TransactionSkeleton } from '../components/SkeletonLoaders';
+import { MobileNavSpacer } from '../components/MobileNav';
 
 export function Transactions() {
   const { user } = useAuth();
@@ -36,12 +39,15 @@ export function Transactions() {
       <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-4">
-            <button
+            <motion.button
               onClick={() => navigate('/dashboard')}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="p-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+              aria-label="Back to dashboard"
             >
               <ArrowLeft className="w-5 h-5" />
-            </button>
+            </motion.button>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Transaction History
             </h1>
@@ -50,28 +56,19 @@ export function Transactions() {
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
-          </div>
+          <TransactionSkeleton count={5} />
         ) : transactions.length === 0 ? (
-          <motion.div
-            variants={fadeIn}
-            initial="initial"
-            animate="animate"
-            className="text-center py-12"
-          >
-            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-              <ArrowUpRight className="w-8 h-8 text-gray-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              No transactions yet
-            </h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Your payment history will appear here
-            </p>
-          </motion.div>
+          <EmptyState
+            icon={Clock}
+            title="No transactions yet"
+            description="Your payment history will appear here once you start sending or receiving PYUSD"
+            action={{
+              label: 'Start Sending',
+              onClick: () => navigate('/dashboard'),
+            }}
+          />
         ) : (
           <div className="space-y-4">
             {transactions.map((tx, index) => (
@@ -138,6 +135,7 @@ export function Transactions() {
           </div>
         )}
       </div>
+      <MobileNavSpacer />
     </div>
   );
 }

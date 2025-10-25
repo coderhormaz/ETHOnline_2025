@@ -31,8 +31,13 @@ A modern, secure Web3 payment application that brings UPI-like instant payments 
 ### 🎨 **Premium UI/UX**
 - Apple Pay & Paytm-inspired design
 - Smooth animations with Framer Motion
-- Glassmorphism effects
+- Glassmorphism effects & gradient backgrounds
 - Fully responsive (mobile-first)
+- **NEW**: Mobile bottom navigation
+- **NEW**: Skeleton loading states
+- **NEW**: Empty state components
+- **NEW**: Safe-area support for notched devices
+- Dark mode support throughout
 
 ---
 
