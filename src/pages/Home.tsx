@@ -1,10 +1,20 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { ArrowRight, Zap, Shield, Wallet, QrCode, Globe, CheckCircle2, Sparkles } from 'lucide-react';
 import { fadeIn, slideUp, staggerContainer } from '../lib/animations';
+import { useAuth } from '../contexts/AuthContext';
 
 export function Home() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   const features = [
     {

@@ -5,7 +5,6 @@ import { Send, QrCode, History, LogOut, RefreshCw, TrendingUp, ArrowUpRight, Arr
 import { useAuth } from '../contexts/AuthContext';
 import { useWallet } from '../contexts/WalletContext';
 import { BalanceCard } from '../components/BalanceCard';
-import { SendModal } from '../components/SendModal';
 import { PageLoader } from '../components/LoadingStates';
 import { DashboardSkeleton } from '../components/SkeletonLoaders';
 import { MobileNavSpacer } from '../components/MobileNav';
@@ -15,7 +14,6 @@ export function Dashboard() {
   const { signOut } = useAuth();
   const { walletData, loading, refreshWallet } = useWallet();
   const navigate = useNavigate();
-  const [sendModalOpen, setSendModalOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [displayBalance, setDisplayBalance] = useState(0);
   const balanceControls = useAnimation();
@@ -57,8 +55,8 @@ export function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 sm:p-6">
-        <div className="max-w-4xl mx-auto pt-20">
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 md:pl-64">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <DashboardSkeleton />
         </div>
       </div>
@@ -67,7 +65,7 @@ export function Dashboard() {
 
   if (!walletData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 md:pl-64">
         <div className="text-center">
           <p className="text-gray-600 dark:text-gray-400">Failed to load wallet data</p>
           <button
@@ -82,12 +80,13 @@ export function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 md:pl-64">
       {/* Header */}
       <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            {/* Mobile Logo - Hidden on Desktop */}
+            <div className="flex items-center gap-3 md:hidden">
               <motion.div
                 whileHover={{ scale: 1.05, rotate: 5 }}
                 transition={{ type: "spring", stiffness: 300 }}
@@ -103,13 +102,24 @@ export function Dashboard() {
                 </p>
               </div>
             </div>
+            
+            {/* Desktop Title */}
+            <div className="hidden md:block">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Dashboard</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Welcome back, {walletData?.handle || 'Loading...'}
+              </p>
+            </div>
+            
+            {/* Action Buttons */}
             <div className="flex items-center gap-2 sm:gap-3">
               <motion.button
                 onClick={handleRefresh}
                 disabled={refreshing}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="p-2.5 rounded-xl text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+                className="p-2.5 rounded-xl text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all min-w-[44px] min-h-[44px] flex items-center justify-center"
+                aria-label="Refresh wallet data"
               >
                 <RefreshCw className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
               </motion.button>
@@ -117,7 +127,8 @@ export function Dashboard() {
                 onClick={handleSignOut}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all min-h-[44px]"
+                aria-label="Sign out"
               >
                 <LogOut className="w-5 h-5" />
                 <span className="text-sm font-medium hidden sm:inline">Sign Out</span>
@@ -186,21 +197,23 @@ export function Dashboard() {
           <motion.div variants={fadeIn} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Send Payment */}
             <motion.button
-              onClick={() => setSendModalOpen(true)}
+              onClick={() => navigate('/send')}
               whileHover={{ y: -5 }}
               whileTap={{ scale: 0.98 }}
-              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-6 shadow-lg hover:shadow-premium transition-all group border border-gray-200/50 dark:border-gray-700/50"
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-6 shadow-lg hover:shadow-premium transition-all group border border-gray-200/50 dark:border-gray-700/50 text-left min-h-[160px] flex flex-col"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="w-14 h-14 bg-gradient-primary rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-14 h-14 bg-gradient-primary rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg flex-shrink-0">
                   <Send className="w-7 h-7 text-white" />
                 </div>
-                <ArrowUpRight className="w-5 h-5 text-gray-400 group-hover:text-primary-500 transition-colors" />
+                <ArrowUpRight className="w-5 h-5 text-gray-400 group-hover:text-primary-500 transition-colors flex-shrink-0" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Send</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Transfer PYUSD instantly
-              </p>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Send</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Transfer PYUSD instantly
+                </p>
+              </div>
             </motion.button>
 
             {/* Receive Payment */}
@@ -208,18 +221,20 @@ export function Dashboard() {
               onClick={() => navigate('/receive')}
               whileHover={{ y: -5 }}
               whileTap={{ scale: 0.98 }}
-              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-6 shadow-lg hover:shadow-premium transition-all group border border-gray-200/50 dark:border-gray-700/50"
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-6 shadow-lg hover:shadow-premium transition-all group border border-gray-200/50 dark:border-gray-700/50 text-left min-h-[160px] flex flex-col"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg flex-shrink-0">
                   <QrCode className="w-7 h-7 text-white" />
                 </div>
-                <ArrowDownLeft className="w-5 h-5 text-gray-400 group-hover:text-green-500 transition-colors" />
+                <ArrowDownLeft className="w-5 h-5 text-gray-400 group-hover:text-green-500 transition-colors flex-shrink-0" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Receive</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Show your QR code
-              </p>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Receive</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Show your QR code
+                </p>
+              </div>
             </motion.button>
 
             {/* Transaction History */}
@@ -227,18 +242,20 @@ export function Dashboard() {
               onClick={() => navigate('/transactions')}
               whileHover={{ y: -5 }}
               whileTap={{ scale: 0.98 }}
-              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-6 shadow-lg hover:shadow-premium transition-all group border border-gray-200/50 dark:border-gray-700/50"
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-6 shadow-lg hover:shadow-premium transition-all group border border-gray-200/50 dark:border-gray-700/50 text-left min-h-[160px] flex flex-col"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-accent-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-accent-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg flex-shrink-0">
                   <History className="w-7 h-7 text-white" />
                 </div>
-                <Clock className="w-5 h-5 text-gray-400 group-hover:text-accent-500 transition-colors" />
+                <Clock className="w-5 h-5 text-gray-400 group-hover:text-accent-500 transition-colors flex-shrink-0" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">History</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                View transactions
-              </p>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">History</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  View transactions
+                </p>
+              </div>
             </motion.button>
           </motion.div>
 
@@ -272,9 +289,6 @@ export function Dashboard() {
         </motion.div>
       </div>
 
-      {/* Send Modal */}
-      <SendModal isOpen={sendModalOpen} onClose={() => setSendModalOpen(false)} />
-      
       {/* Mobile Navigation Spacer */}
       <MobileNavSpacer />
     </div>

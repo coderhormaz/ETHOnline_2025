@@ -19,9 +19,16 @@ export function Signup() {
   const [handleError, setHandleError] = useState('');
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [formErrors, setFormErrors] = useState({ email: '', password: '', handle: '' });
-  const { signUp } = useAuth();
+  const { signUp, user } = useAuth();
   const navigate = useNavigate();
   const { showToast, ToastContainer } = useToast();
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, navigate]);
 
   // Calculate password strength
   const calculatePasswordStrength = (pwd: string): number => {
