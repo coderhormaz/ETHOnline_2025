@@ -98,7 +98,7 @@ export function Settings() {
                   {walletData.handle}
                 </h3>
                 <p className="text-white/80 text-sm">
-                  PYUSD Pay User
+                  StackFlow User
                 </p>
               </div>
             </div>

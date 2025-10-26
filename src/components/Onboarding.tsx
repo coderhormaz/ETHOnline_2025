@@ -10,7 +10,7 @@ interface OnboardingProps {
 const slides = [
   {
     icon: Wallet,
-    title: 'Welcome to PYUSD Pay',
+    title: 'Welcome to StackFlow',
     description: 'Your secure EVM wallet is automatically created with AES-256 encrypted private keys. Server-side signing keeps your funds safe!',
     gradient: 'from-primary-500 to-primary-600',
   },

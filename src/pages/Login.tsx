@@ -78,7 +78,7 @@ export function Login() {
             </motion.div>
           </Link>
           <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent mb-2">
-            PYUSD Pay
+            StackFlow
           </h1>
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
             Your gateway to instant crypto payments

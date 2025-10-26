@@ -71,7 +71,7 @@ export function Profile() {
                   {walletData.handle}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">
-                  PYUSD Pay User
+                  StackFlow User
                 </p>
               </div>
             </div>

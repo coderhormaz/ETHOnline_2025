@@ -581,7 +581,7 @@ export function PaymentLink() {
 
           {/* Footer Info */}
           <div className="text-center text-xs text-gray-400 dark:text-gray-500 mt-6">
-            <p>Powered by PYUSD Pay • Sepolia Network</p>
+            <p>Powered by StackFlow • Sepolia Network</p>
           </div>
         </motion.div>
       </div>

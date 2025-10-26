@@ -99,7 +99,7 @@ export function Dashboard() {
               </motion.div>
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                  PYUSD Pay
+                  StackFlow
                 </h1>
                 <p className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
                   {walletData?.handle || 'Loading...'}

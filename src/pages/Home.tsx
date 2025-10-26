@@ -147,7 +147,7 @@ export function Home() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
-                  PYUSD Pay
+                  StackFlow
                 </h1>
                 <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                   Premium Crypto Payments
@@ -272,7 +272,7 @@ export function Home() {
               transition={{ delay: 0.2 }}
               className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 mb-10 leading-relaxed max-w-3xl mx-auto"
             >
-              Enterprise-grade PYUSD payments with{' '}
+              Enterprise-grade StackFlowments with{' '}
               <span className="font-semibold text-gray-900 dark:text-white">@handle</span> transfers,{' '}
               <span className="font-semibold text-gray-900 dark:text-white">smart portfolios</span>, and{' '}
               <span className="font-semibold text-gray-900 dark:text-white">payment infrastructure</span>
@@ -409,7 +409,7 @@ export function Home() {
             className="text-center mb-12"
           >
             <h2 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white mb-4">
-              Why Choose PYUSD Pay
+              Why Choose StackFlow
             </h2>
             <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
               The complete PYUSD platform on Ethereum Sepolia
@@ -675,7 +675,7 @@ export function Home() {
               Trusted by Thousands
             </h2>
             <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-              See what our users are saying about PYUSD Pay
+              See what our users are saying about StackFlow
             </p>
           </motion.div>
 
@@ -955,7 +955,7 @@ export function Home() {
                 Ready to Get Started?
               </h2>
               <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
-                Join thousands using PYUSD Pay. Create your account in minutes.
+                Join thousands using StackFlow. Create your account in minutes.
               </p>
 
               <motion.button
@@ -981,13 +981,13 @@ export function Home() {
                 <CreditCard className="w-5 h-5 text-white" />
               </div>
               <div>
-                <div className="text-lg font-bold text-white">PYUSD Pay</div>
+                <div className="text-lg font-bold text-white">StackFlow</div>
                 <div className="text-xs text-gray-400">Enterprise Crypto Payments</div>
               </div>
             </div>
 
             <div className="text-center md:text-right text-sm text-gray-400">
-              <p>© 2025 PYUSD Pay. All rights reserved.</p>
+              <p>© 2025 StackFlow. All rights reserved.</p>
               <p className="mt-1 text-xs">Built on Ethereum Sepolia</p>
             </div>
           </div>

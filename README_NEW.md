@@ -1,4 +1,4 @@
-# PYUSD Pay - Blockchain UPI MVP
+# StackFlow - Blockchain UPI MVP
 
 A modern, premium blockchain-based UPI payment system built on Arbitrum with PYUSD. Experience instant crypto payments with a sleek, Apple Pay-inspired interface.
 
