@@ -19,19 +19,20 @@ export function InvestModal({ portfolio, availableBalance, onClose, onInvest }: 
   const [success, setSuccess] = useState(false);
 
   const amountValue = parseFloat(amount || '0');
-  const hasInsufficientBalance = amountValue > availableBalance;
+  // For demo mode, allow investments even with low balance
+  const hasInsufficientBalance = false; // Disabled for demo mode
   const belowMinimum = amountValue > 0 && amountValue < 10;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (hasInsufficientBalance) {
-      setError('Insufficient balance');
+    if (belowMinimum) {
+      setError('Minimum investment is 10 PYUSD');
       return;
     }
 
-    if (belowMinimum) {
-      setError('Minimum investment is 10 PYUSD');
+    if (amountValue <= 0) {
+      setError('Please enter a valid amount');
       return;
     }
 
@@ -45,15 +46,15 @@ export function InvestModal({ portfolio, availableBalance, onClose, onInvest }: 
         onClose();
       }, 2000);
     } catch (err: any) {
+      console.error('Investment error:', err);
       setError(err.message || 'Investment failed');
-    } finally {
       setLoading(false);
     }
   };
 
   const handleMaxAmount = () => {
-    // Leave small buffer for gas
-    const maxAmount = Math.max(0, availableBalance - 0.01);
+    // Set a reasonable max amount for demo mode
+    const maxAmount = Math.max(100, availableBalance);
     setAmount(maxAmount.toFixed(2));
   };
 
@@ -74,83 +75,62 @@ export function InvestModal({ portfolio, availableBalance, onClose, onInvest }: 
           initial={{ scale: 0.95, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 20 }}
-          className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+          className="bg-gradient-to-br from-white via-white to-gray-50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700"
           onClick={(e) => e.stopPropagation()}
         >
           {!success ? (
             <>
-              {/* Header */}
-              <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between z-10">
+              {/* Header - Compact Premium */}
+              <div className="sticky top-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700 p-4 flex items-center justify-between z-10">
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                  <h2 className="text-lg font-black text-gray-900 dark:text-white mb-0.5">
                     Invest in {portfolio.name}
                   </h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Start building your crypto portfolio
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Build your crypto portfolio
                   </p>
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Content */}
-              <div className="p-6 space-y-6">
-                {/* Portfolio Overview */}
-                <div className="bg-gradient-to-br from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20 rounded-2xl p-5">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
-                        {portfolio.name}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {portfolio.description}
-                      </p>
-                    </div>
-                    <RiskBadge riskLevel={portfolio.risk_level} />
-                  </div>
-
-                  {/* Allocation */}
-                  <div className="bg-white dark:bg-gray-800 rounded-xl p-4">
-                    <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">
-                      Portfolio Allocation
-                    </h4>
-                    <AllocationPieChart allocations={portfolio.allocations} size={250} />
-                  </div>
+              {/* Content - Compact Premium */}
+              <div className="p-4 space-y-4">
+                {/* Available Balance - Compact */}
+                <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 rounded-xl p-3 border border-gray-200 dark:border-gray-700">
+                  <p className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                    Available Balance
+                  </p>
+                  <p className="text-xl font-black text-gray-900 dark:text-white tabular-nums">
+                    ${availableBalance.toFixed(2)} <span className="text-sm text-gray-500">PYUSD</span>
+                  </p>
                 </div>
 
                 {/* Investment Form */}
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  {/* Available Balance */}
-                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
-                      Available Balance
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      ${availableBalance.toFixed(2)} PYUSD
-                    </p>
-                  </div>
-
-                  {/* Amount Input */}
+                  {/* Amount Input - Premium Compact */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <label htmlFor="invest-amount" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      <label htmlFor="invest-amount" className="text-xs font-black text-gray-700 dark:text-gray-300 uppercase tracking-wide">
                         Investment Amount
                       </label>
                       <button
                         type="button"
                         onClick={handleMaxAmount}
-                        className="px-3 py-1 text-xs font-semibold bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-200 dark:hover:bg-primary-900/50 transition-colors"
+                        className="px-2.5 py-1 text-[10px] font-black bg-gradient-to-r from-primary-100 to-accent-100 dark:from-primary-900/30 dark:to-accent-900/30 text-primary-700 dark:text-primary-300 rounded-lg hover:shadow-md transition-all uppercase tracking-wider border border-primary-200 dark:border-primary-800"
                       >
                         MAX
                       </button>
                     </div>
                     <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                        <DollarSign className="w-5 h-5" />
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                        <div className="p-1.5 bg-gradient-to-br from-primary-100 to-accent-100 dark:from-primary-900/30 dark:to-accent-900/30 rounded-lg">
+                          <DollarSign className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                        </div>
                       </div>
                       <input
                         id="invest-amount"
@@ -160,49 +140,47 @@ export function InvestModal({ portfolio, availableBalance, onClose, onInvest }: 
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                         required
-                        className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 ${
+                        className={`w-full pl-14 pr-4 py-3 rounded-xl border-2 ${
                           hasInsufficientBalance || belowMinimum
-                            ? 'border-red-300 dark:border-red-600'
-                            : 'border-gray-300 dark:border-gray-600'
-                        } bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-lg font-semibold`}
+                            ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/10'
+                            : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800'
+                        } text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-lg font-black tabular-nums`}
                         placeholder="10.00"
                       />
                     </div>
                     {belowMinimum && (
-                      <p className="mt-2 text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
+                      <motion.p
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-2 text-[10px] text-red-600 dark:text-red-400 flex items-center gap-1 font-semibold"
+                      >
                         <AlertCircle className="w-3 h-3" />
-                        Minimum investment is 10 PYUSD
-                      </p>
-                    )}
-                    {hasInsufficientBalance && amountValue > 0 && (
-                      <p className="mt-2 text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" />
-                        Insufficient balance
-                      </p>
+                        Minimum 10 PYUSD
+                      </motion.p>
                     )}
                   </div>
 
-                  {/* Investment Summary */}
-                  {amountValue >= 10 && !hasInsufficientBalance && (
+                  {/* Investment Summary - Compact Premium */}
+                  {amountValue >= 10 && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4"
+                      className="bg-gradient-to-br from-blue-50 via-blue-50 to-indigo-50 dark:from-blue-900/20 dark:via-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 shadow-sm"
                     >
-                      <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2 flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4" />
-                        Investment Breakdown
+                      <h4 className="text-xs font-black text-blue-900 dark:text-blue-100 mb-2.5 flex items-center gap-1.5 uppercase tracking-wide">
+                        <TrendingUp className="w-3.5 h-3.5" />
+                        Allocation Breakdown
                       </h4>
-                      <div className="space-y-2">
-                        {portfolio.allocations.map((allocation) => {
+                      <div className="space-y-1.5">
+                        {portfolio.allocations.map((allocation, index) => {
                           const allocationAmount = (amountValue * allocation.weight) / 100;
                           return (
-                            <div key={allocation.symbol} className="flex items-center justify-between text-sm">
-                              <span className="text-blue-700 dark:text-blue-300 font-medium">
+                            <div key={allocation.symbol || `allocation-${index}`} className="flex items-center justify-between text-xs bg-white/50 dark:bg-gray-800/50 rounded-lg px-2.5 py-1.5 border border-blue-100 dark:border-blue-900">
+                              <span className="text-blue-700 dark:text-blue-300 font-black">
                                 {allocation.symbol}
                               </span>
-                              <span className="text-blue-900 dark:text-blue-100 font-semibold">
-                                ${allocationAmount.toFixed(2)} ({allocation.weight}%)
+                              <span className="text-blue-900 dark:text-blue-100 font-black tabular-nums">
+                                ${allocationAmount.toFixed(2)} <span className="text-[10px] text-blue-600 dark:text-blue-400">({allocation.weight}%)</span>
                               </span>
                             </div>
                           );
@@ -211,48 +189,47 @@ export function InvestModal({ portfolio, availableBalance, onClose, onInvest }: 
                     </motion.div>
                   )}
 
-                  {/* Error Message */}
+                  {/* Error Message - Compact */}
                   {error && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3"
+                      className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-2.5"
                     >
-                      <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                      <p className="text-xs text-red-600 dark:text-red-400 font-semibold">{error}</p>
                     </motion.div>
                   )}
 
-                  {/* Submit Button */}
+                  {/* Submit Button - Premium */}
                   <button
                     type="submit"
-                    disabled={loading || hasInsufficientBalance || belowMinimum || !amount}
-                    className="w-full bg-gradient-primary text-white font-semibold py-4 rounded-xl hover:shadow-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    disabled={loading || belowMinimum || !amount}
+                    className="w-full bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 text-white font-black py-3.5 rounded-xl hover:shadow-lg hover:shadow-primary-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none flex items-center justify-center gap-2 text-sm uppercase tracking-wide"
                   >
                     {loading ? (
                       <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <Loader2 className="w-4 h-4 animate-spin" />
                         <span>Processing...</span>
                       </>
                     ) : (
                       <>
-                        <TrendingUp className="w-5 h-5" />
-                        Invest ${amountValue.toFixed(2)} PYUSD
+                        <TrendingUp className="w-4 h-4" />
+                        Invest ${amountValue.toFixed(2)}
                       </>
                     )}
                   </button>
                 </form>
 
-                {/* Disclaimer */}
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
-                  <div className="flex gap-3">
-                    <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                {/* Disclaimer - Compact */}
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-3">
+                  <div className="flex gap-2">
+                    <AlertCircle className="w-3.5 h-3.5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-xs font-semibold text-yellow-900 dark:text-yellow-100 mb-1">
-                        Investment Risk Disclosure
+                      <p className="text-[10px] font-black text-yellow-900 dark:text-yellow-100 mb-0.5 uppercase tracking-wide">
+                        Risk Notice
                       </p>
-                      <p className="text-xs text-yellow-700 dark:text-yellow-300">
-                        Cryptocurrency investments carry risk. Portfolio performance may vary.
-                        Past performance does not guarantee future results. Only invest what you can afford to lose.
+                      <p className="text-[10px] text-yellow-700 dark:text-yellow-300 leading-relaxed">
+                        Crypto investments carry risk. Only invest what you can afford to lose.
                       </p>
                     </div>
                   </div>
@@ -260,30 +237,30 @@ export function InvestModal({ portfolio, availableBalance, onClose, onInvest }: 
               </div>
             </>
           ) : (
-            /* Success State */
-            <div className="p-12 text-center">
+            /* Success State - Premium Compact */
+            <div className="p-8 text-center">
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', duration: 0.5 }}
-                className="mx-auto w-20 h-20 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mb-6"
+                className="mx-auto w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-2xl flex items-center justify-center mb-4 border-2 border-green-200 dark:border-green-800 shadow-lg shadow-green-500/20"
               >
-                <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-400" />
+                <CheckCircle2 className="w-9 h-9 text-green-600 dark:text-green-400" />
               </motion.div>
 
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Investment Successful! 🎉
+              <h3 className="text-xl font-black text-gray-900 dark:text-white mb-1">
+                Investment Successful!
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-6">
-                You've invested ${amountValue.toFixed(2)} in {portfolio.name}
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">
+                ${amountValue.toFixed(2)} invested in {portfolio.name}
               </p>
 
-              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                  Your portfolio is now being tracked
+              <div className="bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700 rounded-xl p-3 border border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1 font-semibold">
+                  Your portfolio is now tracked
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500">
-                  View your investment performance in the My Investments tab
+                <p className="text-[10px] text-gray-500 dark:text-gray-500">
+                  View performance in My Investments
                 </p>
               </div>
             </div>

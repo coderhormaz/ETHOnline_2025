@@ -80,7 +80,7 @@ A complete crypto portfolio investment system with live Pyth Network price track
 - Bluechip: BTC, ETH, SOL, AVAX
 - Layer 1: ADA
 - Layer 2: ARB, OP
-- DeFi: AAVE, UNI, MKR, CRV
+- DeFi: AAVE, UNI, SKY, CRV
 - AI: FET, AGIX, OCEAN, STRK
 - Meme: PEPE, DOGE, SHIB
 
@@ -217,7 +217,7 @@ A complete crypto portfolio investment system with live Pyth Network price track
 **Allocation:**
 - AAVE: 30%
 - UNI: 25%
-- MKR: 20%
+- SKY: 20%
 - CRV: 15%
 - ARB: 10%
 

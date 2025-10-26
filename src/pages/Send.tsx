@@ -270,6 +270,7 @@ export function Send() {
 
     setLoading(false);
   };
+  
 
   const handleMaxAmount = () => {
     if (walletData?.balance) {

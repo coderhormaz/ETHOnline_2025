@@ -40,9 +40,9 @@ export function PortfolioCard({ portfolio }: PortfolioCardProps) {
 
       {/* Token Allocations - Compact */}
       <div className="flex items-center gap-1 mb-3 overflow-x-auto pb-1 scrollbar-hide">
-        {portfolio.allocations.slice(0, 4).map((allocation) => (
+        {portfolio.allocations.slice(0, 4).map((allocation, index) => (
           <div
-            key={allocation.symbol}
+            key={allocation.symbol || `allocation-${index}`}
             className="flex-shrink-0 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-[10px] font-bold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
           >
             {allocation.symbol} {allocation.weight}%

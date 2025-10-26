@@ -19,7 +19,7 @@ export const PYTH_PRICE_FEEDS = {
   DOGE: '0xdcef50dd0a4cd2dcc17e45df1676dcb336a11a61c69df7a0299b0150c672d25c', // DOGE/USD ✅
   SHIB: '0xf0d57deca57b3da2fe63a493f4c25925fdfd8edf834b20f93e1f84dbd1504d4a', // SHIB/USD ✅
   ADA: '0x2a01deaec9e51a579277b34b122399984d0bbf57e2458a7e42fecd2829867a0d', // ADA/USD ✅
-  MKR: '0xa483243eed64ca27a1f6e26385b7d1e0d07e9fe264bb6903efb3efc4689d3fe7', // MKR/USD ✅
+  SKY: '0xa483243eed64ca27a1f6e26385b7d1e0d07e9fe264bb6903efb3efc4689d3fe7', // SKY/USD (formerly MKR) ✅
   CRV: '0xa19d04ac696c7a6616d291c7e5d1377cc8be437c327b75adb5dc1bad745fcae8', // CRV/USD ✅
   STRK: '0x6a182399ff70ccf3e06024898942028204125a819e519a335ffa4579e66cd870', // STRK/USD ✅
   FET: '0x7da003ada32eabbac855af3d22fcf0fe692cc589f0cfd5ced63cf0bdcc742efe', // FET/USD ✅
@@ -237,7 +237,7 @@ function getMockPrice(symbol: TokenSymbol): number {
     DOGE: 0.15,
     SHIB: 0.000018,
     ADA: 0.38,
-    MKR: 1450.0,
+    SKY: 1450.0,
     CRV: 0.45,
     STRK: 0.52,
     FET: 1.35, // AI token realistic price

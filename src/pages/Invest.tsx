@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, Wallet, PieChart, Search, Shield, Zap, Target, BarChart3, Sparkles, TrendingDown } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useWallet } from '../contexts/WalletContext';
-import { fetchPortfolios, getMyInvestments, investInPortfolio, type Portfolio, type UserInvestment } from '../services/portfolio';
+import { fetchPortfolios, getMyInvestments, investInPortfolio, withdrawFromPortfolio, type Portfolio, type UserInvestment } from '../services/portfolio';
 import { PortfolioCard } from '../components/PortfolioCard';
 import { InvestModal } from '../components/InvestModal';
+import { WithdrawModal } from '../components/WithdrawModal';
 import { EmptyState } from '../components/EmptyState';
 import { MobileNavSpacer } from '../components/MobileNav';
 import { fadeIn, slideUp } from '../lib/animations';
@@ -25,6 +26,8 @@ export function Invest() {
   const [selectedRisk, setSelectedRisk] = useState<number | 'all'>('all');
   const [selectedPortfolio, setSelectedPortfolio] = useState<Portfolio | null>(null);
   const [showInvestModal, setShowInvestModal] = useState(false);
+  const [selectedInvestment, setSelectedInvestment] = useState<UserInvestment | null>(null);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   
   const availableBalance = parseFloat(walletData?.balance || '0');
 
@@ -53,11 +56,16 @@ export function Invest() {
     if (!user) return;
     
     setLoading(true);
-    const result = await getMyInvestments(user.id);
-    if (result.success && result.investments) {
-      setMyInvestments(result.investments);
+    try {
+      const result = await getMyInvestments(user.id);
+      if (result.success && result.investments) {
+        setMyInvestments(result.investments);
+      }
+    } catch (error) {
+      console.error('Error loading investments:', error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleInvest = async (portfolio: Portfolio) => {
@@ -66,22 +74,57 @@ export function Invest() {
   };
 
   const handleInvestConfirm = async (amount: number) => {
-    if (!user || !selectedPortfolio) return;
+    if (!user || !selectedPortfolio) {
+      console.error('Missing user or portfolio:', { user: !!user, selectedPortfolio: !!selectedPortfolio });
+      return;
+    }
 
-    const result = await investInPortfolio(user.id, selectedPortfolio.portfolio_id, amount);
+    console.log('Investing:', { userId: user.id, portfolioId: selectedPortfolio.id, amount });
+    const result = await investInPortfolio(user.id, selectedPortfolio.id, amount);
+    console.log('Investment result:', result);
     
     if (result.success) {
+      console.log('Investment successful, refreshing data...');
       // Refresh data
       await loadPortfolios();
       await loadMyInvestments();
       refreshWallet();
       
+      // Switch to My Investments tab to show the new investment
+      setActiveTab('my-investments');
+      
       // Close modal
       setShowInvestModal(false);
       setSelectedPortfolio(null);
     } else {
+      console.error('Investment failed:', result.error);
       throw new Error(result.error);
     }
+  };
+
+  const handleWithdraw = async (shares?: number) => {
+    if (!user || !selectedInvestment) return { success: false, error: 'Missing data' };
+    
+    const portfolio = selectedInvestment.portfolio as Portfolio;
+    const result = await withdrawFromPortfolio(user.id, portfolio.id, shares);
+    
+    if (result.success) {
+      // Refresh data
+      await loadMyInvestments();
+      await loadPortfolios();
+      refreshWallet();
+      
+      // Close modal
+      setShowWithdrawModal(false);
+      setSelectedInvestment(null);
+    }
+    
+    return result;
+  };
+
+  const handleRedeemClick = (investment: UserInvestment) => {
+    setSelectedInvestment(investment);
+    setShowWithdrawModal(true);
   };
 
   // Filter portfolios
@@ -274,7 +317,11 @@ export function Invest() {
                 ) : myInvestments.length > 0 ? (
                   <div className="space-y-3">
                     {myInvestments.map((investment) => (
-                      <InvestmentCard key={investment.id} investment={investment} />
+                      <InvestmentCard 
+                        key={investment.id} 
+                        investment={investment}
+                        onRedeem={() => handleRedeemClick(investment)}
+                      />
                     ))}
                   </div>
                 ) : (
@@ -306,6 +353,19 @@ export function Invest() {
             setSelectedPortfolio(null);
           }}
           onInvest={handleInvestConfirm}
+        />
+      )}
+
+      {/* Withdraw Modal */}
+      {showWithdrawModal && selectedInvestment && (
+        <WithdrawModal
+          investment={selectedInvestment}
+          portfolio={selectedInvestment.portfolio as Portfolio}
+          onClose={() => {
+            setShowWithdrawModal(false);
+            setSelectedInvestment(null);
+          }}
+          onWithdraw={handleWithdraw}
         />
       )}
 
@@ -347,18 +407,24 @@ function TabButton({ active, onClick, icon, label, badge }: TabButtonProps) {
 // Investment Card Component - More Compact
 interface InvestmentCardProps {
   investment: UserInvestment;
+  onRedeem: () => void;
 }
 
-function InvestmentCard({ investment }: InvestmentCardProps) {
+function InvestmentCard({ investment, onRedeem }: InvestmentCardProps) {
   const portfolio = investment.portfolio as Portfolio;
   const profitLoss = investment.profit_loss || 0;
   const profitLossPercent = investment.profit_loss_percent || 0;
   const isPositive = profitLoss >= 0;
+  const investedDate = new Date(investment.invested_at).toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric', 
+    year: 'numeric' 
+  });
 
   return (
     <motion.div
       whileHover={{ scale: 1.005 }}
-      className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all cursor-pointer"
+      className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 transition-all"
     >
       <div className="flex items-center justify-between mb-3">
         <div className="flex-1 min-w-0">
@@ -366,7 +432,7 @@ function InvestmentCard({ investment }: InvestmentCardProps) {
             {portfolio.name}
           </h3>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Invested: ${investment.pyusd_amount.toFixed(2)}
+            ${investment.pyusd_amount.toFixed(2)} • {investedDate}
           </p>
         </div>
         <div className="text-right ml-4">
@@ -380,11 +446,33 @@ function InvestmentCard({ investment }: InvestmentCardProps) {
         </div>
       </div>
 
+      {/* P/L and ROI Row */}
+      <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-100 dark:border-gray-800">
+        <div>
+          <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">Profit/Loss</p>
+          <p className={`text-sm font-bold ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            {isPositive ? '+' : ''}${profitLoss.toFixed(2)}
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">ROI</p>
+          <p className={`text-sm font-bold ${isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            {isPositive ? '+' : ''}{profitLossPercent.toFixed(2)}%
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">Shares</p>
+          <p className="text-sm font-bold text-gray-900 dark:text-white">
+            {investment.shares.toFixed(2)}
+          </p>
+        </div>
+      </div>
+
       {/* Compact Allocation Tags */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-        {portfolio.allocations.slice(0, 5).map((allocation) => (
+      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide mb-3">
+        {portfolio.allocations.slice(0, 5).map((allocation, index) => (
           <div
-            key={allocation.symbol}
+            key={allocation.symbol || `alloc-${index}`}
             className="flex-shrink-0 px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-[10px] font-bold text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
           >
             {allocation.symbol} {allocation.weight}%
@@ -396,6 +484,18 @@ function InvestmentCard({ investment }: InvestmentCardProps) {
           </div>
         )}
       </div>
+
+      {/* Redeem Button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onRedeem();
+        }}
+        className="w-full bg-gradient-to-r from-orange-500 to-pink-500 text-white text-sm font-semibold py-2 rounded-lg hover:shadow-lg transition-all flex items-center justify-center gap-2"
+      >
+        <TrendingDown className="w-4 h-4" />
+        Redeem Investment
+      </button>
     </motion.div>
   );
 }

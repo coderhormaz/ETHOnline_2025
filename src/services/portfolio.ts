@@ -178,36 +178,46 @@ export async function investInPortfolio(
   error?: string;
 }> {
   try {
+    console.log('💰 Starting investment:', { userId, portfolioId, pyusdAmount });
+    
     // Validate amount
     if (pyusdAmount < 10) {
       throw new Error('Minimum investment is 10 PYUSD');
     }
 
     // Get portfolio
+    console.log('📊 Fetching portfolio...');
     const { data: portfolio, error: portfolioError } = await supabase
       .from('portfolios')
       .select('*')
-      .eq('portfolio_id', portfolioId)
+      .eq('id', portfolioId)
       .single();
 
-    if (portfolioError) throw portfolioError;
+    if (portfolioError) {
+      console.error('Portfolio fetch error:', portfolioError);
+      throw portfolioError;
+    }
     if (!portfolio) throw new Error('Portfolio not found');
+    
+    console.log('✅ Portfolio found:', portfolio.name);
 
     // Calculate shares (simplified for MVP)
     // shares = investment amount (1:1 for first investor, proportional for subsequent)
     const shares = pyusdAmount;
 
     // Check if user already has investment
+    console.log('🔍 Checking for existing investment...');
     const { data: existingInvestment } = await supabase
       .from('user_investments')
       .select('*')
       .eq('user_id', userId)
-      .eq('portfolio_id', portfolio.portfolio_id)
+      .eq('portfolio_id', portfolioId)
       .single();
 
     let investment;
 
     if (existingInvestment) {
+      console.log('📈 Updating existing investment...');
       // Update existing investment
       const { data, error } = await supabase
         .from('user_investments')
@@ -221,15 +231,20 @@ export async function investInPortfolio(
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Update investment error:', error);
+        throw error;
+      }
       investment = data;
+      console.log('✅ Investment updated');
     } else {
+      console.log('🆕 Creating new investment...');
       // Create new investment
       const { data, error } = await supabase
         .from('user_investments')
         .insert({
           user_id: userId,
-          portfolio_id: portfolio.portfolio_id,
+          portfolio_id: portfolioId,
           pyusd_amount: pyusdAmount,
           shares,
           current_value: pyusdAmount,
@@ -239,35 +254,50 @@ export async function investInPortfolio(
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Create investment error:', error);
+        throw error;
+      }
       investment = data;
+      console.log('✅ Investment created');
     }
 
     // Update portfolio total invested
-    await supabase
+    console.log('📊 Updating portfolio totals...');
+    const { error: updateError } = await supabase
       .from('portfolios')
       .update({
-        total_invested: portfolio.total_invested + pyusdAmount,
-        current_nav: portfolio.current_nav + pyusdAmount,
+        total_invested: (portfolio.total_invested || 0) + pyusdAmount,
+        current_nav: (portfolio.current_nav || 0) + pyusdAmount,
       })
-      .eq('portfolio_id', portfolio.portfolio_id);
+      .eq('id', portfolioId);
+
+    if (updateError) {
+      console.error('Portfolio update error:', updateError);
+    }
 
     // Record transaction
-    await supabase.from('investment_transactions').insert({
+    console.log('📝 Recording transaction...');
+    const { error: txError } = await supabase.from('investment_transactions').insert({
       user_id: userId,
-      portfolio_id: portfolio.portfolio_id,
+      portfolio_id: portfolioId,
       transaction_type: 'invest',
       pyusd_amount: pyusdAmount,
       shares_amount: shares,
-      nav_at_transaction: portfolio.current_nav,
+      nav_at_transaction: portfolio.current_nav || 0,
     });
 
+    if (txError) {
+      console.error('Transaction record error:', txError);
+    }
+
+    console.log('🎉 Investment completed successfully!');
     return {
       success: true,
       investment: investment as UserInvestment,
     };
   } catch (error: any) {
-    console.error('Error investing in portfolio:', error);
+    console.error('❌ Error investing in portfolio:', error);
     return {
       success: false,
       error: error.message || 'Failed to invest in portfolio',
@@ -276,7 +306,7 @@ export async function investInPortfolio(
 }
 
 /**
- * Withdraw from a portfolio
+ * Withdraw from a portfolio with real-time profit/loss calculation
  */
 export async function withdrawFromPortfolio(
   userId: string,
@@ -285,13 +315,15 @@ export async function withdrawFromPortfolio(
 ): Promise<{
   success: boolean;
   pyusdAmount?: number;
+  profitLoss?: number;
+  profitLossPercent?: number;
   error?: string;
 }> {
   try {
     // Get user investment
     const { data: investment, error: investmentError } = await supabase
       .from('user_investments')
-      .select('*, portfolio:portfolios(*)')
+      .select('*')
       .eq('user_id', userId)
       .eq('portfolio_id', portfolioId)
       .single();
@@ -299,19 +331,38 @@ export async function withdrawFromPortfolio(
     if (investmentError) throw investmentError;
     if (!investment) throw new Error('Investment not found');
 
+    // Get portfolio details
+    const { data: portfolio, error: portfolioError } = await supabase
+      .from('portfolios')
+      .select('*')
+      .eq('id', portfolioId)
+      .single();
+
+    if (portfolioError) throw portfolioError;
+    if (!portfolio) throw new Error('Portfolio not found');
+
+    // Calculate current portfolio value using live Pyth prices
+    const symbols = portfolio.allocations.map((a: any) => a.symbol as TokenSymbol);
+    const currentValue = await calculatePortfolioValue(
+      portfolio.allocations,
+      investment.pyusd_amount
+    );
+
     // Calculate withdrawal amount
     const sharesToRedeem = sharesToWithdraw || investment.shares;
     if (sharesToRedeem > investment.shares) {
       throw new Error('Insufficient shares');
     }
 
-    // Calculate PYUSD amount (simplified: 1:1 with current value)
     const withdrawalPercent = sharesToRedeem / investment.shares;
-    const pyusdAmount = investment.current_value * withdrawalPercent;
+    const pyusdAmount = currentValue * withdrawalPercent;
+    const initialInvestment = investment.pyusd_amount * withdrawalPercent;
+    const profitLoss = pyusdAmount - initialInvestment;
+    const profitLossPercent = (profitLoss / initialInvestment) * 100;
 
     // Update investment
     const remainingShares = investment.shares - sharesToRedeem;
-    const remainingValue = investment.current_value - pyusdAmount;
+    const remainingInvestment = investment.pyusd_amount * (1 - withdrawalPercent);
 
     if (remainingShares === 0) {
       // Delete investment if fully withdrawn
@@ -325,21 +376,22 @@ export async function withdrawFromPortfolio(
         .from('user_investments')
         .update({
           shares: remainingShares,
-          current_value: remainingValue,
-          pyusd_amount: remainingValue,
+          pyusd_amount: remainingInvestment,
+          current_value: currentValue * (1 - withdrawalPercent),
+          profit_loss: profitLoss,
+          profit_loss_percent: profitLossPercent,
           last_withdrawal: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
         .eq('id', investment.id);
     }
 
-    // Update portfolio total invested
-    const portfolio = investment.portfolio as any;
+    // Update portfolio totals
     await supabase
       .from('portfolios')
       .update({
-        total_invested: portfolio.total_invested - pyusdAmount,
-        current_nav: portfolio.current_nav - pyusdAmount,
+        total_invested: (portfolio.total_invested || 0) - initialInvestment,
+        current_nav: (portfolio.current_nav || 0) - pyusdAmount,
       })
       .eq('id', portfolioId);
 
@@ -350,12 +402,15 @@ export async function withdrawFromPortfolio(
       transaction_type: 'withdraw',
       pyusd_amount: pyusdAmount,
       shares_amount: sharesToRedeem,
-      nav_at_transaction: portfolio.current_nav,
+      nav_at_transaction: currentValue,
+      notes: `Profit/Loss: ${profitLoss.toFixed(2)} PYUSD (${profitLossPercent.toFixed(2)}%)`,
     });
 
     return {
       success: true,
       pyusdAmount,
+      profitLoss,
+      profitLossPercent,
     };
   } catch (error: any) {
     console.error('Error withdrawing from portfolio:', error);

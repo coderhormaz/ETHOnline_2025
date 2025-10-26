@@ -55,7 +55,7 @@ Located in: `src/lib/blockchain/pyth.ts`
 
 **Supported Tokens:**
 - BTC, ETH, SOL, AVAX, ARB, OP
-- AAVE, UNI, MKR, CRV
+- AAVE, UNI, SKY, CRV
 - DOGE, SHIB, PEPE, ADA
 - FET, AGIX, OCEAN, STRK
 
@@ -191,7 +191,7 @@ Added route: `/invest` → Protected route to Invest page
 ### 5. **DeFi Revival** 🧩
 - **Category:** DeFi
 - **Risk:** Medium-High
-- **Allocation:** AAVE 30%, UNI 30%, MKR 25%, CRV 15%
+- **Allocation:** AAVE 30%, UNI 30%, SKY 25%, CRV 15%
 - **Rebalance:** Bi-weekly
 - **Target:** DeFi fundamentals
 

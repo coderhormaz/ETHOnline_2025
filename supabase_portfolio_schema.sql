@@ -324,13 +324,13 @@ INSERT INTO portfolios (portfolio_id, name, description, category, risk_level, t
   '[
     {"symbol": "AAVE", "name": "Aave", "address": "0x...", "logo": ""},
     {"symbol": "UNI", "name": "Uniswap", "address": "0x...", "logo": ""},
-    {"symbol": "MKR", "name": "Maker", "address": "0x...", "logo": ""},
+    {"symbol": "SKY", "name": "Sky Protocol", "address": "0x...", "logo": ""},
     {"symbol": "CRV", "name": "Curve", "address": "0x...", "logo": ""}
   ]'::jsonb,
   '[
     {"symbol": "AAVE", "weight": 30},
     {"symbol": "UNI", "weight": 30},
-    {"symbol": "MKR", "weight": 25},
+    {"symbol": "SKY", "weight": 25},
     {"symbol": "CRV", "weight": 15}
   ]'::jsonb,
   1209600 -- 14 days
