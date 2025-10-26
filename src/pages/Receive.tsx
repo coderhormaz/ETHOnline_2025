@@ -239,7 +239,7 @@ export function Receive() {
               <p>
                 {amount 
                   ? 'Share this QR code to request a specific amount' 
-                  : 'Share this QR code or your handle to receive StackFlowments'}
+                  : 'Share this QR code or your handle to receive PYUSD payments'}
               </p>
             </div>
           </motion.div>

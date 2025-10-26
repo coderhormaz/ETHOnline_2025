@@ -90,6 +90,7 @@ export function PaymentLink() {
 
         setPaymentRequest(link);
         
+        // If already paid, show success state immediately
         if (link.paid) {
           setSuccess(true);
           setTxHash(link.tx_hash || '');
@@ -218,6 +219,12 @@ export function PaymentLink() {
         throw new Error(updateResult.error || 'Failed to update payment status');
       }
       
+      // Refresh payment request data to reflect the paid status
+      const refreshedLink = await getPaymentLink(linkId!);
+      if (refreshedLink.success && refreshedLink.data) {
+        setPaymentRequest(refreshedLink.data);
+      }
+      
       setTxHash(receipt.hash);
       setSuccess(true);
       showToast('Payment sent successfully!', 'success');
@@ -275,54 +282,6 @@ export function PaymentLink() {
             <p className="text-sm text-gray-600 dark:text-gray-400">
               This payment link is invalid, has expired, or has already been paid.
             </p>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
-
-  // Check if already paid
-  if (paymentRequest.paid && !success) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4">
-        <ToastContainer />
-        <div className="text-center max-w-md w-full">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-100 dark:border-gray-700"
-          >
-            <div className="w-14 h-14 bg-green-100 dark:bg-green-900/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <CheckCircle2 className="w-8 h-8 text-green-500" />
-            </div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-              Already Paid
-            </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              This payment link has already been paid.
-            </p>
-            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mt-4">
-              <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide font-medium">Amount</p>
-              <div className="flex items-baseline gap-1.5">
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{paymentRequest.amount}</p>
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">PYUSD</p>
-              </div>
-              {paymentRequest.tx_hash && (
-                <>
-                  <div className="border-t border-gray-200 dark:border-gray-600 my-3"></div>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide font-medium">Transaction</p>
-                  <a
-                    href={`https://sepolia.etherscan.io/tx/${paymentRequest.tx_hash}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[11px] text-primary-600 dark:text-primary-400 hover:underline font-mono break-all inline-flex items-center gap-1"
-                  >
-                    {paymentRequest.tx_hash.substring(0, 16)}...
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                </>
-              )}
-            </div>
           </motion.div>
         </div>
       </div>
