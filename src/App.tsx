@@ -17,8 +17,7 @@ const Send = lazy(() => import('./pages/Send').then(m => ({ default: m.Send })))
 const Transactions = lazy(() => import('./pages/Transactions').then(m => ({ default: m.Transactions })));
 const Receive = lazy(() => import('./pages/Receive').then(m => ({ default: m.Receive })));
 const WalletOverview = lazy(() => import('./pages/WalletOverview').then(m => ({ default: m.WalletOverview })));
-const Profile = lazy(() => import('./pages/Profile').then(m => ({ default: m.Profile })));
-const Security = lazy(() => import('./pages/Security').then(m => ({ default: m.Security })));
+const Settings = lazy(() => import('./pages/Settings').then(m => ({ default: m.Settings })));
 const PaymentLink = lazy(() => import('./pages/PaymentLink').then(m => ({ default: m.PaymentLink })));
 const PaymentLinks = lazy(() => import('./pages/PaymentLinks').then(m => ({ default: m.default })));
 
@@ -89,18 +88,10 @@ function AppContent() {
             }
           />
           <Route
-            path="/profile"
+            path="/settings"
             element={
               <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/security"
-            element={
-              <ProtectedRoute>
-                <Security />
+                <Settings />
               </ProtectedRoute>
             }
           />

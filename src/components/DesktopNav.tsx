@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Send, QrCode, Clock, Sparkles, Wallet, User, Shield, Link } from 'lucide-react';
+import { Home, Send, QrCode, Clock, Sparkles, Wallet, Settings, Link } from 'lucide-react';
 
 interface NavItem {
   path: string;
@@ -15,8 +15,7 @@ const navItems: NavItem[] = [
   { path: '/payment-links', icon: Link, label: 'Payment Links' },
   { path: '/transactions', icon: Clock, label: 'History' },
   { path: '/wallet', icon: Wallet, label: 'Wallet' },
-  { path: '/profile', icon: User, label: 'Profile' },
-  { path: '/security', icon: Shield, label: 'Security' },
+  { path: '/settings', icon: Settings, label: 'Settings' },
 ];
 
 export function DesktopNav() {
