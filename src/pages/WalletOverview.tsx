@@ -125,14 +125,28 @@ export function WalletOverview() {
 
               {/* Balance */}
               <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl text-white">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-3">
                   <div>
-                    <p className="text-white/80 text-xs mb-1">PYUSD Balance</p>
+                    <p className="text-white/80 text-xs mb-1">Available Balance</p>
                     <p className="text-3xl font-bold">${parseFloat(walletData.balance).toFixed(2)}</p>
                   </div>
                   <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                     <TrendingUp className="w-6 h-6" />
                   </div>
+                </div>
+                
+                {/* Balance Breakdown */}
+                <div className="pt-3 border-t border-white/20 space-y-1.5">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-white/70">Total Balance</span>
+                    <span className="font-semibold">${parseFloat(walletData.blockchainBalance).toFixed(2)}</span>
+                  </div>
+                  {parseFloat(walletData.totalInvested) > 0 && (
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-white/70">Invested in Portfolios</span>
+                      <span className="font-semibold">-${parseFloat(walletData.totalInvested).toFixed(2)}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 

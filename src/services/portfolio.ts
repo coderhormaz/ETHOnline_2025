@@ -481,6 +481,30 @@ export async function getMyInvestments(userId: string): Promise<{
 }
 
 /**
+ * Get total amount invested by user across all portfolios
+ */
+export async function getTotalInvestedAmount(userId: string): Promise<number> {
+  try {
+    const { data, error } = await supabase
+      .from('user_investments')
+      .select('pyusd_amount')
+      .eq('user_id', userId);
+
+    if (error) throw error;
+
+    // Sum all invested amounts
+    const total = (data || []).reduce((sum, investment) => {
+      return sum + parseFloat(investment.pyusd_amount || '0');
+    }, 0);
+
+    return total;
+  } catch (error: any) {
+    console.error('Error fetching total invested amount:', error);
+    return 0;
+  }
+}
+
+/**
  * Get portfolio performance history
  */
 export async function getPortfolioPerformance(portfolioId: string): Promise<{

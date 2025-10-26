@@ -26,11 +26,11 @@ const PaymentLinks = lazy(() => import('./pages/PaymentLinks').then(m => ({ defa
 function AppContent() {
   const location = useLocation();
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const showMobileNav = !['/home', '/', '/signup'].includes(location.pathname) && 
+  const showMobileNav = !['/login', '/signup', '/'].includes(location.pathname) && 
                         !location.pathname.startsWith('/pay/');
 
   useEffect(() => {
-    // Check if user needs onboarding after first login
+    // Check if user needs onboarding after first login (only for authenticated pages)
     if (showMobileNav && shouldShowOnboarding()) {
       setShowOnboarding(true);
     }
@@ -45,8 +45,8 @@ function AppContent() {
       {showMobileNav && <DesktopNav />}
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          <Route path="/home" element={<Home />} />
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/pay/:linkId" element={<PaymentLink />} />
           <Route
@@ -121,7 +121,7 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/home" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         {showMobileNav && <MobileNav />}
       </Suspense>

@@ -11,25 +11,25 @@ const slides = [
   {
     icon: Wallet,
     title: 'Welcome to PYUSD Pay',
-    description: 'Your secure wallet is automatically created when you sign up. No complex setup required!',
+    description: 'Your secure EVM wallet is automatically created with AES-256 encrypted private keys. Server-side signing keeps your funds safe!',
     gradient: 'from-primary-500 to-primary-600',
   },
   {
     icon: AtSign,
-    title: 'Your Unique Handle',
-    description: 'Get a simple @handle for receiving payments. Share it with anyone - no long addresses needed.',
+    title: 'Your Payment Handle',
+    description: 'Get a simple @username handle for receiving payments. Share it like UPI—no long addresses, just @yourname!',
     gradient: 'from-accent-500 to-accent-600',
   },
   {
     icon: Send,
     title: 'Instant Transfers',
-    description: 'Send and receive PYUSD instantly on Arbitrum. Scan QR codes or use handles for quick payments.',
+    description: 'Send PYUSD to any @handle or wallet address. Create payment links and QR codes for easy receiving. All on Ethereum Sepolia!',
     gradient: 'from-green-500 to-emerald-600',
   },
   {
     icon: Shield,
-    title: 'Bank-Level Security',
-    description: 'Your private keys are encrypted with AES-256. We never have access to your funds.',
+    title: 'Invest & Grow',
+    description: 'Invest PYUSD in expert crypto portfolios with auto-rebalancing and real-time Pyth price feeds. Your money works for you!',
     gradient: 'from-blue-500 to-indigo-600',
   },
 ];

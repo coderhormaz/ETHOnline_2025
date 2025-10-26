@@ -19,13 +19,17 @@ export function InvestModal({ portfolio, availableBalance, onClose, onInvest }: 
   const [success, setSuccess] = useState(false);
 
   const amountValue = parseFloat(amount || '0');
-  // For demo mode, allow investments even with low balance
-  const hasInsufficientBalance = false; // Disabled for demo mode
+  const hasInsufficientBalance = amountValue > availableBalance;
   const belowMinimum = amountValue > 0 && amountValue < 10;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (hasInsufficientBalance) {
+      setError('Insufficient balance');
+      return;
+    }
+
     if (belowMinimum) {
       setError('Minimum investment is 10 PYUSD');
       return;
@@ -53,9 +57,7 @@ export function InvestModal({ portfolio, availableBalance, onClose, onInvest }: 
   };
 
   const handleMaxAmount = () => {
-    // Set a reasonable max amount for demo mode
-    const maxAmount = Math.max(100, availableBalance);
-    setAmount(maxAmount.toFixed(2));
+    setAmount(availableBalance.toFixed(2));
   };
 
   return (

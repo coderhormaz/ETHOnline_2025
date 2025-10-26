@@ -8,6 +8,8 @@ import { useAuth } from './AuthContext';
 interface WalletData {
   publicAddress: string;
   balance: string;
+  blockchainBalance: string;
+  totalInvested: string;
   handle: string;
 }
 
@@ -58,14 +60,27 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       }
 
       // Fetch balance from blockchain
-      const balance = await getPYUSDBalance(wallet.public_address);
+      const blockchainBalance = await getPYUSDBalance(wallet.public_address);
+
+      // Fetch total invested amount from user_investments
+      const { data: investments, error: investError } = await supabase
+        .from('user_investments')
+        .select('pyusd_amount')
+        .eq('user_id', user.id);
+
+      const totalInvested = investments?.reduce((sum, inv) => sum + parseFloat(inv.pyusd_amount), 0) || 0;
+
+      // Calculate available balance = blockchain balance - total invested
+      const availableBalance = Math.max(0, parseFloat(blockchainBalance) - totalInvested);
 
       // Fetch handle
       const handle = await getUserHandle(user.id);
 
       setWalletData({
         publicAddress: wallet.public_address,
-        balance,
+        balance: availableBalance.toFixed(6),
+        blockchainBalance,
+        totalInvested: totalInvested.toFixed(6),
         handle: handle || '',
       });
     } catch (error) {
