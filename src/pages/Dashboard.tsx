@@ -143,17 +143,17 @@ export function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24">
         <motion.div
           variants={staggerContainer}
           initial="initial"
           animate="animate"
-          className="space-y-6 sm:space-y-8"
+          className="space-y-4 sm:space-y-5"
         >
-          {/* Hero Balance Section */}
+          {/* Hero Balance Section - Compact */}
           <motion.div
             variants={slideUp}
-            className="relative overflow-hidden bg-gradient-to-br from-primary-500 via-primary-600 to-accent-500 rounded-3xl p-6 sm:p-8 text-white shadow-premium"
+            className="relative overflow-hidden bg-gradient-to-br from-primary-500 via-primary-600 to-accent-500 rounded-2xl p-5 sm:p-6 text-white shadow-premium"
           >
             {/* Background decoration */}
             <div className="absolute inset-0 opacity-10">
@@ -162,14 +162,14 @@ export function Dashboard() {
             </div>
             
             <div className="relative z-10">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-white/80 text-sm mb-1">Total Balance</p>
+                  <p className="text-white/80 text-xs mb-1">Total Balance</p>
                   <motion.div
                     key={displayBalance}
                     initial={{ scale: 1.1, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="text-4xl sm:text-5xl font-bold tracking-tight"
+                    className="text-3xl sm:text-4xl font-bold tracking-tight"
                   >
                     ${displayBalance.toFixed(2)}
                   </motion.div>
@@ -177,44 +177,44 @@ export function Dashboard() {
                 <motion.div
                   animate={{ rotate: [0, 10, -10, 0] }}
                   transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                  className="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm"
+                  className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm"
                 >
-                  <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8" />
+                  <TrendingUp className="w-6 h-6" />
                 </motion.div>
               </div>
               
-              <div className="flex items-center gap-4 sm:gap-6">
+              <div className="flex items-center gap-4">
                 <div>
-                  <p className="text-white/70 text-xs mb-1">Your Handle</p>
-                  <p className="font-mono text-sm sm:text-base font-medium">{walletData?.handle || '---'}</p>
+                  <p className="text-white/70 text-xs mb-0.5">Your Handle</p>
+                  <p className="font-mono text-sm font-medium">{walletData?.handle || '---'}</p>
                 </div>
-                <div className="h-8 w-px bg-white/30" />
+                <div className="h-6 w-px bg-white/30" />
                 <div>
-                  <p className="text-white/70 text-xs mb-1">Network</p>
-                  <p className="text-sm sm:text-base font-medium">Ethereum Sepolia</p>
+                  <p className="text-white/70 text-xs mb-0.5">Network</p>
+                  <p className="text-sm font-medium">Sepolia</p>
                 </div>
               </div>
             </div>
           </motion.div>
 
-          {/* Quick Actions */}
-          <motion.div variants={fadeIn} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Quick Actions - Compact */}
+          <motion.div variants={fadeIn} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {/* Send Payment */}
             <motion.button
               onClick={() => navigate('/send')}
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -3 }}
               whileTap={{ scale: 0.98 }}
-              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-6 shadow-lg hover:shadow-premium transition-all group border border-gray-200/50 dark:border-gray-700/50 text-left min-h-[160px] flex flex-col"
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl p-4 shadow-lg hover:shadow-premium transition-all group border border-gray-200/50 dark:border-gray-700/50 text-left min-h-[120px] flex flex-col"
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-14 h-14 bg-gradient-primary rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg flex-shrink-0">
-                  <Send className="w-7 h-7 text-white" />
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-11 h-11 bg-gradient-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg flex-shrink-0">
+                  <Send className="w-5 h-5 text-white" />
                 </div>
-                <ArrowUpRight className="w-5 h-5 text-gray-400 group-hover:text-primary-500 transition-colors flex-shrink-0" />
+                <ArrowUpRight className="w-4 h-4 text-gray-400 group-hover:text-primary-500 transition-colors flex-shrink-0" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Send</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <h3 className="text-base font-bold text-gray-900 dark:text-white mb-0.5">Send</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   Transfer PYUSD instantly
                 </p>
               </div>
@@ -223,19 +223,19 @@ export function Dashboard() {
             {/* Receive Payment */}
             <motion.button
               onClick={() => navigate('/receive')}
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -3 }}
               whileTap={{ scale: 0.98 }}
-              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-6 shadow-lg hover:shadow-premium transition-all group border border-gray-200/50 dark:border-gray-700/50 text-left min-h-[160px] flex flex-col"
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl p-4 shadow-lg hover:shadow-premium transition-all group border border-gray-200/50 dark:border-gray-700/50 text-left min-h-[120px] flex flex-col"
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg flex-shrink-0">
-                  <QrCode className="w-7 h-7 text-white" />
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-11 h-11 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg flex-shrink-0">
+                  <QrCode className="w-5 h-5 text-white" />
                 </div>
-                <ArrowDownLeft className="w-5 h-5 text-gray-400 group-hover:text-green-500 transition-colors flex-shrink-0" />
+                <ArrowDownLeft className="w-4 h-4 text-gray-400 group-hover:text-green-500 transition-colors flex-shrink-0" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Receive</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <h3 className="text-base font-bold text-gray-900 dark:text-white mb-0.5">Receive</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   Show your QR code
                 </p>
               </div>
@@ -244,48 +244,48 @@ export function Dashboard() {
             {/* Transaction History */}
             <motion.button
               onClick={() => navigate('/transactions')}
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -3 }}
               whileTap={{ scale: 0.98 }}
-              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-6 shadow-lg hover:shadow-premium transition-all group border border-gray-200/50 dark:border-gray-700/50 text-left min-h-[160px] flex flex-col"
+              className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl p-4 shadow-lg hover:shadow-premium transition-all group border border-gray-200/50 dark:border-gray-700/50 text-left min-h-[120px] flex flex-col"
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-accent-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg flex-shrink-0">
-                  <History className="w-7 h-7 text-white" />
+              <div className="flex items-center justify-between mb-3">
+                <div className="w-11 h-11 bg-gradient-to-br from-accent-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg flex-shrink-0">
+                  <History className="w-5 h-5 text-white" />
                 </div>
-                <Clock className="w-5 h-5 text-gray-400 group-hover:text-accent-500 transition-colors flex-shrink-0" />
+                <Clock className="w-4 h-4 text-gray-400 group-hover:text-accent-500 transition-colors flex-shrink-0" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">History</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <h3 className="text-base font-bold text-gray-900 dark:text-white mb-0.5">History</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   View transactions
                 </p>
               </div>
             </motion.button>
           </motion.div>
 
-          {/* Info Section */}
+          {/* Info Section - Compact */}
           <motion.div
             variants={fadeIn}
-            className="bg-gradient-to-br from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20 backdrop-blur-xl rounded-3xl p-6 border border-primary-200/50 dark:border-primary-800/50 shadow-lg"
+            className="bg-gradient-to-br from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20 backdrop-blur-xl rounded-2xl p-4 border border-primary-200/50 dark:border-primary-800/50 shadow-lg"
           >
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-3">
               <motion.div
                 animate={{ rotate: [0, 10, -10, 10, 0] }}
                 transition={{ duration: 2, repeat: Infinity, repeatDelay: 5 }}
                 className="flex-shrink-0"
               >
-                <Sparkles className="w-6 h-6 text-primary-500" />
+                <Sparkles className="w-5 h-5 text-primary-500" />
               </motion.div>
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1">
                   Quick Tip
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+                <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
                   Share your handle{' '}
-                  <span className="font-mono bg-white dark:bg-gray-800 px-2 py-1 rounded-lg text-primary-600 dark:text-primary-400 font-semibold">
+                  <span className="font-mono bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded text-primary-600 dark:text-primary-400 font-semibold">
                     {walletData.handle}
                   </span>
-                  {' '}with friends to receive instant PYUSD payments! No long addresses needed.
+                  {' '}with friends to receive instant payments!
                 </p>
               </div>
             </div>

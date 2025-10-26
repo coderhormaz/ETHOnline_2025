@@ -256,24 +256,24 @@ export function Send() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24">
         <motion.div
           initial="initial"
           animate="animate"
           variants={fadeIn}
-          className="space-y-6"
+          className="space-y-4"
         >
           {!success ? (
             <>
-              {/* Send Form Card */}
+              {/* Send Form Card - Compact */}
               <motion.div
                 variants={slideUp}
-                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-lg border border-gray-200/50 dark:border-gray-700/50"
+                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl p-5 shadow-lg border border-gray-200/50 dark:border-gray-700/50"
               >
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Recipient Handle */}
                   <div>
-                    <label htmlFor="recipient-handle" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label htmlFor="recipient-handle" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                       Recipient Handle
                     </label>
                     <div className="relative">
@@ -284,7 +284,7 @@ export function Send() {
                         onChange={(e) => setRecipientHandle(e.target.value)}
                         required
                         autoComplete="off"
-                        className="w-full px-4 py-3 pr-14 rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-base"
+                        className="w-full px-4 py-3 pr-12 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-sm font-mono"
                         placeholder="username@pyusd"
                         aria-describedby="recipient-help"
                       />
@@ -293,10 +293,10 @@ export function Send() {
                         onClick={() => setShowScanner(true)}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-xl transition-colors"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
                         aria-label="Scan QR code"
                       >
-                        <QrCode className="w-5 h-5" />
+                        <QrCode className="w-4 h-4" />
                       </motion.button>
                     </div>
                     <p id="recipient-help" className="mt-1 text-xs text-gray-500 dark:text-gray-400">
@@ -309,12 +309,12 @@ export function Send() {
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4"
+                      className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3"
                     >
-                      <p className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">
+                      <p className="text-xs font-semibold text-blue-900 dark:text-blue-100 mb-0.5">
                         📝 Payment Request
                       </p>
-                      <p className="text-sm text-blue-700 dark:text-blue-300">
+                      <p className="text-xs text-blue-700 dark:text-blue-300">
                         {paymentNote}
                       </p>
                     </motion.div>
@@ -334,7 +334,7 @@ export function Send() {
                       onChange={(e) => setAmount(e.target.value)}
                       required
                       autoComplete="off"
-                      className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-base"
+                      className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-sm"
                       placeholder="0.00"
                       aria-describedby="amount-help"
                     />
@@ -349,9 +349,9 @@ export function Send() {
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       role="alert"
-                      className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4"
+                      className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3"
                     >
-                      <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+                      <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
                     </motion.div>
                   )}
 
@@ -359,7 +359,7 @@ export function Send() {
                   <motion.button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-primary text-white font-semibold py-4 rounded-2xl hover:shadow-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 min-h-[56px]"
+                    className="w-full bg-gradient-primary text-white font-semibold py-3 rounded-xl hover:shadow-glow transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 min-h-[48px]"
                     whileTap={{ scale: loading ? 1 : 0.98 }}
                     whileHover={{ scale: loading ? 1 : 1.02 }}
                     aria-label="Send PYUSD payment"
@@ -420,12 +420,12 @@ export function Send() {
                 </a>
 
                 {/* Action Buttons */}
-                <div className="flex gap-4">
+                <div className="flex gap-3">
                   <motion.button
                     onClick={handleReset}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex-1 bg-gradient-primary text-white font-semibold py-3 rounded-2xl hover:shadow-glow transition-all"
+                    className="flex-1 bg-gradient-primary text-white font-semibold py-2.5 rounded-xl hover:shadow-glow transition-all min-h-[48px]"
                   >
                     Send Another
                   </motion.button>
@@ -433,7 +433,7 @@ export function Send() {
                     onClick={() => navigate('/dashboard')}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold py-3 rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                    className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold py-2.5 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors min-h-[48px]"
                   >
                     Go to Dashboard
                   </motion.button>
@@ -463,7 +463,7 @@ export function Send() {
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white dark:bg-gray-800 rounded-3xl shadow-premium max-w-md w-full p-6 relative"
+                className="bg-white dark:bg-gray-800 rounded-2xl shadow-premium max-w-md w-full p-5 relative"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Close Button */}
@@ -478,11 +478,11 @@ export function Send() {
                 </motion.button>
 
                 {/* Header */}
-                <div className="mb-4 text-center">
-                  <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-100 dark:bg-primary-900/20 rounded-2xl mb-3">
-                    <ScanLine className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                <div className="mb-3 text-center">
+                  <div className="inline-flex items-center justify-center w-10 h-10 bg-primary-100 dark:bg-primary-900/20 rounded-xl mb-2">
+                    <ScanLine className="w-5 h-5 text-primary-600 dark:text-primary-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-0.5">
                     Scan QR Code
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -491,7 +491,7 @@ export function Send() {
                 </div>
 
                 {/* QR Reader */}
-                <div className="relative rounded-2xl overflow-hidden bg-black">
+                <div className="relative rounded-xl overflow-hidden bg-black">
                   <div 
                     id="qr-reader" 
                     ref={qrReaderRef}

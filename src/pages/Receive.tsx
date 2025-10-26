@@ -135,7 +135,7 @@ export function Receive() {
       </div>
 
       {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24">
         <motion.div
           variants={fadeIn}
           initial="initial"
@@ -145,14 +145,14 @@ export function Receive() {
           {/* QR Code Card */}
           <motion.div
             variants={slideUp}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl p-8 shadow-premium mb-8"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-5 shadow-premium mb-4"
           >
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
               {amount ? 'Payment Request' : 'Scan to Pay'}
             </h2>
 
             {/* Amount Input (Optional) */}
-            <div className="mb-6 space-y-4">
+            <div className="mb-4 space-y-3">
               <div>
                 <label htmlFor="receive-amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-left">
                   Request Amount (Optional)
@@ -165,7 +165,7 @@ export function Receive() {
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="0.00"
-                  className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-base"
+                  className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-sm"
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 text-left">
                   Leave empty for any amount
@@ -183,24 +183,24 @@ export function Receive() {
                   onChange={(e) => setNote(e.target.value)}
                   placeholder="What's this payment for?"
                   maxLength={50}
-                  className="w-full px-4 py-3 rounded-2xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-base"
+                  className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-sm"
                 />
               </div>
             </div>
 
             {/* QR Code */}
-            <div className="bg-white p-6 rounded-2xl inline-block mb-6">
+            <div className="bg-white p-4 rounded-xl inline-block mb-4">
               <QRCode
                 value={getQRData()}
-                size={256}
+                size={200}
               />
             </div>
 
             {/* Payment Details Display */}
             {amount && parseFloat(amount) > 0 && (
-              <div className="bg-gradient-to-br from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20 rounded-2xl p-4 mb-4">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Requesting</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              <div className="bg-gradient-to-br from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20 rounded-xl p-3 mb-3">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Requesting</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
                   {amount} PYUSD
                 </p>
                 {note && (
@@ -212,10 +212,10 @@ export function Receive() {
             )}
 
             {/* Handle Display */}
-            <div className="bg-gradient-card backdrop-blur-xl rounded-2xl p-6 border border-primary-100 dark:border-primary-900 mb-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Your Payment Handle</p>
+            <div className="bg-gradient-card backdrop-blur-xl rounded-xl p-4 border border-primary-100 dark:border-primary-900 mb-3">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Your Payment Handle</p>
               <div className="flex items-center justify-center gap-2">
-                <span className="text-2xl font-bold text-gray-900 dark:text-white font-mono">
+                <span className="text-xl font-bold text-gray-900 dark:text-white font-mono">
                   {walletData.handle}
                 </span>
                 <motion.button
@@ -245,11 +245,11 @@ export function Receive() {
           </motion.div>
 
           {/* Info Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <motion.div
               variants={slideUp}
               transition={{ delay: 0.1 }}
-              className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-2xl p-6 text-left"
+              className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-xl p-4 text-left"
             >
               <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
                 ⚡ Instant Transfers
@@ -262,7 +262,7 @@ export function Receive() {
             <motion.div
               variants={slideUp}
               transition={{ delay: 0.2 }}
-              className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-2xl p-6 text-left"
+              className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl rounded-xl p-4 text-left"
             >
               <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
                 🔒 Secure
@@ -277,17 +277,17 @@ export function Receive() {
           <motion.div
             variants={slideUp}
             transition={{ delay: 0.3 }}
-            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl p-8 shadow-premium border-2 border-accent-200 dark:border-accent-800"
+            className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-5 shadow-premium border-2 border-accent-200 dark:border-accent-800"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-accent-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <LinkIcon className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-accent-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <LinkIcon className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                   External Payment Link
                 </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-xs text-gray-600 dark:text-gray-400">
                   Accept payments from any Web3 wallet
                 </p>
               </div>
@@ -297,7 +297,7 @@ export function Receive() {
               onClick={() => setShowEditor(true)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-gradient-to-r from-accent-500 to-purple-600 text-white font-semibold py-4 rounded-2xl hover:shadow-glow transition-all flex items-center justify-center gap-2 mb-4"
+              className="w-full bg-gradient-to-r from-accent-500 to-purple-600 text-white font-semibold py-3 rounded-xl hover:shadow-glow transition-all flex items-center justify-center gap-2 mb-3 min-h-[48px]"
             >
               <Plus className="w-5 h-5" />
               Create Payment Link

@@ -300,20 +300,20 @@ export default function PaymentLinks() {
         </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 gap-3 mb-5">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-2xl p-4 shadow-lg border border-gray-200/50 dark:border-gray-700/50"
+            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-xl p-3 shadow-lg border border-gray-200/50 dark:border-gray-700/50"
           >
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-primary-500/20 rounded-xl flex items-center justify-center">
-                <LinkIcon className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-8 h-8 bg-primary-500/20 rounded-lg flex items-center justify-center">
+                <LinkIcon className="w-4 h-4 text-primary-600 dark:text-primary-400" />
               </div>
               <div>
                 <p className="text-gray-600 dark:text-gray-400 text-xs">Total Links</p>
-                <p className="text-gray-900 dark:text-white text-xl font-bold">{stats.totalLinks}</p>
+                <p className="text-gray-900 dark:text-white text-lg font-bold">{stats.totalLinks}</p>
               </div>
             </div>
           </motion.div>
@@ -322,15 +322,15 @@ export default function PaymentLinks() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-2xl p-4 shadow-lg border border-gray-200/50 dark:border-gray-700/50"
+            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-xl p-3 shadow-lg border border-gray-200/50 dark:border-gray-700/50"
           >
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
-                <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
               </div>
               <div>
                 <p className="text-gray-600 dark:text-gray-400 text-xs">Paid Links</p>
-                <p className="text-gray-900 dark:text-white text-xl font-bold">{stats.paidLinks}</p>
+                <p className="text-gray-900 dark:text-white text-lg font-bold">{stats.paidLinks}</p>
               </div>
             </div>
           </motion.div>
@@ -339,15 +339,15 @@ export default function PaymentLinks() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-2xl p-4 shadow-lg border border-gray-200/50 dark:border-gray-700/50"
+            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-xl p-3 shadow-lg border border-gray-200/50 dark:border-gray-700/50"
           >
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
                 <p className="text-gray-600 dark:text-gray-400 text-xs">Total Received</p>
-                <p className="text-gray-900 dark:text-white text-xl font-bold">${stats.totalReceived.toFixed(2)}</p>
+                <p className="text-gray-900 dark:text-white text-lg font-bold">${stats.totalReceived.toFixed(2)}</p>
               </div>
             </div>
           </motion.div>
@@ -356,22 +356,22 @@ export default function PaymentLinks() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-2xl p-4 shadow-lg border border-gray-200/50 dark:border-gray-700/50"
+            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-xl p-3 shadow-lg border border-gray-200/50 dark:border-gray-700/50"
           >
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-yellow-500/20 rounded-xl flex items-center justify-center">
-                <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center">
+                <Clock className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
               </div>
               <div>
                 <p className="text-gray-600 dark:text-gray-400 text-xs">Pending</p>
-                <p className="text-gray-900 dark:text-white text-xl font-bold">${stats.pendingAmount.toFixed(2)}</p>
+                <p className="text-gray-900 dark:text-white text-lg font-bold">${stats.pendingAmount.toFixed(2)}</p>
               </div>
             </div>
           </motion.div>
         </div>
 
         {/* Search and Filter */}
-        <div className="space-y-3 mb-6">
+        <div className="space-y-3 mb-5">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
             <input
@@ -423,7 +423,7 @@ export default function PaymentLinks() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-lg"
+                className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-lg rounded-xl p-3 border border-gray-200 dark:border-gray-700 shadow-lg"
                 style={{ borderLeftColor: link.color || '#9333ea', borderLeftWidth: '4px' }}
               >
                 <div className="flex items-start justify-between mb-3">

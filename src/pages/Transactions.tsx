@@ -146,14 +146,14 @@ export function Transactions() {
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24">
         {/* Blockchain Transactions Section */}
         {blockchainTxs.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="mb-5">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-3">
               Blockchain Transactions ({blockchainTxs.length})
             </h2>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {blockchainTxs.map((tx, index) => (
                 <motion.div
                   key={tx.hash}
@@ -161,24 +161,24 @@ export function Transactions() {
                   initial="initial"
                   animate="animate"
                   transition={{ delay: index * 0.05 }}
-                  className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg"
+                  className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-xl p-4 shadow-lg"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                         tx.from.toLowerCase() === walletData?.publicAddress.toLowerCase()
                           ? 'bg-red-100 dark:bg-red-900/20'
                           : 'bg-green-100 dark:bg-green-900/20'
                       }`}>
                         {tx.from.toLowerCase() === walletData?.publicAddress.toLowerCase() ? (
-                          <ArrowUpRight className="w-6 h-6 text-red-600 dark:text-red-400" />
+                          <ArrowUpRight className="w-5 h-5 text-red-600 dark:text-red-400" />
                         ) : (
-                          <ArrowDownLeft className="w-6 h-6 text-green-600 dark:text-green-400" />
+                          <ArrowDownLeft className="w-5 h-5 text-green-600 dark:text-green-400" />
                         )}
                       </div>
                       
                       <div>
-                        <div className="font-semibold text-gray-900 dark:text-white mb-1">
+                        <div className="font-semibold text-sm text-gray-900 dark:text-white mb-0.5">
                           {tx.from.toLowerCase() === walletData?.publicAddress.toLowerCase() ? 'Sent' : 'Received'}
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -194,7 +194,7 @@ export function Transactions() {
                     </div>
 
                     <div className="text-right">
-                      <div className={`text-lg font-bold ${
+                      <div className={`text-base font-bold ${
                         tx.from.toLowerCase() === walletData?.publicAddress.toLowerCase()
                           ? 'text-red-600 dark:text-red-400'
                           : 'text-green-600 dark:text-green-400'
@@ -233,8 +233,8 @@ export function Transactions() {
             }}
           />
         ) : transactions.length > 0 ? (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          <div className="space-y-3">
+            <h2 className="text-base font-semibold text-gray-900 dark:text-white mb-3">
               App Transactions ({transactions.length})
             </h2>
             {transactions.map((tx, index) => (
@@ -244,26 +244,26 @@ export function Transactions() {
                 initial="initial"
                 animate="animate"
                 transition={{ delay: index * 0.05 }}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg"
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-xl p-4 shadow-lg"
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                     {/* Icon */}
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                       tx.from_user_id === user?.id
                         ? 'bg-red-100 dark:bg-red-900/20'
                         : 'bg-green-100 dark:bg-green-900/20'
                     }`}>
                       {tx.from_user_id === user?.id ? (
-                        <ArrowUpRight className="w-6 h-6 text-red-600 dark:text-red-400" />
+                        <ArrowUpRight className="w-5 h-5 text-red-600 dark:text-red-400" />
                       ) : (
-                        <ArrowDownLeft className="w-6 h-6 text-green-600 dark:text-green-400" />
+                        <ArrowDownLeft className="w-5 h-5 text-green-600 dark:text-green-400" />
                       )}
                     </div>
 
                     {/* Details */}
                     <div>
-                      <div className="font-semibold text-gray-900 dark:text-white mb-1">
+                      <div className="font-semibold text-sm text-gray-900 dark:text-white mb-0.5">
                         {tx.from_user_id === user?.id ? 'Sent to' : 'Received from'}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -278,7 +278,7 @@ export function Transactions() {
 
                   {/* Amount & Link */}
                   <div className="text-right">
-                    <div className={`text-lg font-bold mb-2 ${
+                    <div className={`text-base font-bold mb-1 ${
                       tx.from_user_id === user?.id
                         ? 'text-red-600 dark:text-red-400'
                         : 'text-green-600 dark:text-green-400'

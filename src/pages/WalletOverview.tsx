@@ -65,36 +65,36 @@ export function WalletOverview() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24">
         <motion.div
           initial="initial"
           animate="animate"
           variants={fadeIn}
-          className="space-y-6"
+          className="space-y-4"
         >
           {/* Wallet Overview Card */}
           <motion.div
             variants={slideUp}
-            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-lg border border-gray-200/50 dark:border-gray-700/50"
+            className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl p-5 shadow-lg border border-gray-200/50 dark:border-gray-700/50"
           >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center">
-                <Wallet className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center">
+                <Wallet className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Your Wallet</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Your Wallet</h2>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               {/* User Handle */}
-              <div className="p-4 bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl text-white">
-                <p className="text-white/80 text-sm mb-2">Your Handle</p>
-                <p className="font-mono text-2xl font-bold">
+              <div className="p-3 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl text-white">
+                <p className="text-white/80 text-xs mb-1">Your Handle</p>
+                <p className="font-mono text-xl font-bold">
                   {walletData.handle}
                 </p>
               </div>
 
               {/* Wallet Address */}
-              <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl">
+              <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Public Address</p>
                   <div className="flex gap-2">
@@ -124,25 +124,25 @@ export function WalletOverview() {
               </div>
 
               {/* Balance */}
-              <div className="p-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl text-white">
+              <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl text-white">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white/80 text-sm mb-2">PYUSD Balance</p>
-                    <p className="text-4xl font-bold">${parseFloat(walletData.balance).toFixed(2)}</p>
+                    <p className="text-white/80 text-xs mb-1">PYUSD Balance</p>
+                    <p className="text-3xl font-bold">${parseFloat(walletData.balance).toFixed(2)}</p>
                   </div>
-                  <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                    <TrendingUp className="w-8 h-8" />
+                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                    <TrendingUp className="w-6 h-6" />
                   </div>
                 </div>
               </div>
 
               {/* Network Info */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Network</p>
-                  <p className="font-semibold text-gray-900 dark:text-white">Ethereum Sepolia</p>
+                  <p className="font-semibold text-sm text-gray-900 dark:text-white">Ethereum Sepolia</p>
                 </div>
-                <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl">
+                <div className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Status</p>
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
@@ -154,12 +154,12 @@ export function WalletOverview() {
           </motion.div>
 
           {/* Quick Actions */}
-          <motion.div variants={slideUp} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <motion.div variants={slideUp} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <motion.button
               onClick={handleCopyAddress}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="p-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 flex items-center gap-3 hover:border-primary-500 transition-colors"
+              className="p-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 flex items-center gap-2 hover:border-primary-500 transition-colors min-h-[48px]"
             >
               <Copy className="w-5 h-5 text-primary-600 dark:text-primary-400" />
               <span className="font-semibold text-gray-900 dark:text-white">Copy Address</span>
@@ -169,7 +169,7 @@ export function WalletOverview() {
               onClick={handleViewOnExplorer}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="p-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 flex items-center gap-3 hover:border-primary-500 transition-colors"
+              className="p-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl rounded-xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 flex items-center gap-2 hover:border-primary-500 transition-colors min-h-[48px]"
             >
               <ExternalLink className="w-5 h-5 text-primary-600 dark:text-primary-400" />
               <span className="font-semibold text-gray-900 dark:text-white">View on Explorer</span>
