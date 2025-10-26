@@ -12,13 +12,24 @@ import { TransactionSkeleton } from '../components/SkeletonLoaders';
 import { MobileNavSpacer } from '../components/MobileNav';
 import { useWallet } from '../contexts/WalletContext';
 import { ethers } from 'ethers';
+import { supabase } from '../lib/supabase';
+
+interface BlockchainTxWithHandle {
+  hash: string;
+  from: string;
+  to: string;
+  value: string;
+  timestamp: number;
+  from_handle?: string;
+  to_handle?: string;
+}
 
 export function Transactions() {
   const { user } = useAuth();
   const { walletData } = useWallet();
   const navigate = useNavigate();
   const [transactions, setTransactions] = useState<TransactionWithDetails[]>([]);
-  const [blockchainTxs, setBlockchainTxs] = useState<any[]>([]);
+  const [blockchainTxs, setBlockchainTxs] = useState<BlockchainTxWithHandle[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchingBlockchain, setFetchingBlockchain] = useState(false);
 
@@ -28,7 +39,53 @@ export function Transactions() {
     setFetchingBlockchain(true);
     try {
       const txs = await fetchBlockchainHistory(walletData.publicAddress);
-      setBlockchainTxs(txs);
+      
+      // Get all unique addresses from blockchain transactions
+      const addresses = new Set<string>();
+      txs.forEach(tx => {
+        addresses.add(tx.from.toLowerCase());
+        addresses.add(tx.to.toLowerCase());
+      });
+
+      // Fetch wallets and handles for these addresses
+      const { data: walletsData } = await supabase
+        .from('wallets')
+        .select('public_address, user_id')
+        .in('public_address', Array.from(addresses).map(a => a as string));
+
+      if (walletsData && walletsData.length > 0) {
+        const userIds = walletsData.map(w => w.user_id);
+        const { data: handlesData } = await supabase
+          .from('handles')
+          .select('user_id, handle')
+          .in('user_id', userIds);
+
+        // Create maps
+        const addressToUserId = new Map<string, string>();
+        walletsData.forEach(w => {
+          addressToUserId.set(w.public_address.toLowerCase(), w.user_id);
+        });
+
+        const userIdToHandle = new Map<string, string>();
+        handlesData?.forEach(h => {
+          userIdToHandle.set(h.user_id, h.handle);
+        });
+
+        // Add handles to transactions
+        const txsWithHandles: BlockchainTxWithHandle[] = txs.map(tx => {
+          const fromUserId = addressToUserId.get(tx.from.toLowerCase());
+          const toUserId = addressToUserId.get(tx.to.toLowerCase());
+          return {
+            ...tx,
+            from_handle: fromUserId ? userIdToHandle.get(fromUserId) : undefined,
+            to_handle: toUserId ? userIdToHandle.get(toUserId) : undefined,
+          };
+        });
+
+        setBlockchainTxs(txsWithHandles);
+      } else {
+        setBlockchainTxs(txs);
+      }
     } catch (error) {
       console.error('Error fetching blockchain transactions:', error);
     } finally {
@@ -126,8 +183,8 @@ export function Transactions() {
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
                           {tx.from.toLowerCase() === walletData?.publicAddress.toLowerCase() 
-                            ? `To: ${tx.to.slice(0, 6)}...${tx.to.slice(-4)}`
-                            : `From: ${tx.from.slice(0, 6)}...${tx.from.slice(-4)}`
+                            ? tx.to_handle || `To: ${tx.to.slice(0, 6)}...${tx.to.slice(-4)}`
+                            : tx.from_handle || `From: ${tx.from.slice(0, 6)}...${tx.from.slice(-4)}`
                           }
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
