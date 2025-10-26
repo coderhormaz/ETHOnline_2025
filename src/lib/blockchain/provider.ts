@@ -12,8 +12,8 @@ if (!RPC_URL) {
  */
 export function getArbitrumProvider(): ethers.JsonRpcProvider {
   return new ethers.JsonRpcProvider(RPC_URL, {
-    chainId: parseInt(CHAIN_ID || '42161'),
-    name: 'arbitrum',
+    chainId: parseInt(CHAIN_ID || '11155111'),
+    name: 'sepolia',
   });
 }
 

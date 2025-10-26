@@ -191,7 +191,7 @@ export function Dashboard() {
                 <div className="h-8 w-px bg-white/30" />
                 <div>
                   <p className="text-white/70 text-xs mb-1">Network</p>
-                  <p className="text-sm sm:text-base font-medium">Arbitrum</p>
+                  <p className="text-sm sm:text-base font-medium">Ethereum Sepolia</p>
                 </div>
               </div>
             </div>

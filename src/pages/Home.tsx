@@ -26,7 +26,7 @@ export function Home() {
     {
       icon: Zap,
       title: 'Lightning Fast Transfers',
-      description: 'Send and receive PYUSD instantly on Arbitrum. No waiting, no delays - just instant payments.',
+      description: 'Send and receive PYUSD instantly on Ethereum Sepolia. No waiting, no delays - just instant payments.',
       gradient: 'from-accent-500 to-accent-600',
     },
     {
@@ -43,8 +43,8 @@ export function Home() {
     },
     {
       icon: Globe,
-      title: 'Built on Arbitrum',
-      description: 'Powered by Arbitrum\'s fast and low-cost Layer 2 solution. Experience blockchain without the high fees.',
+      title: 'Built on Ethereum',
+      description: 'Powered by Ethereum Sepolia testnet. Experience blockchain development and testing with a reliable network.',
       gradient: 'from-purple-500 to-pink-600',
     },
     {
@@ -142,7 +142,7 @@ export function Home() {
             <motion.div variants={fadeIn} className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 dark:bg-primary-900/30 rounded-full mb-6">
               <Sparkles className="w-4 h-4 text-primary-600 dark:text-primary-400" />
               <span className="text-sm font-semibold text-primary-700 dark:text-primary-300">
-                Powered by Arbitrum
+                Powered by Ethereum Sepolia
               </span>
             </motion.div>
 
@@ -497,7 +497,7 @@ export function Home() {
               </div>
               <div>
                 <div className="text-xl font-bold">PYUSD Pay</div>
-                <div className="text-sm text-gray-400">Powered by Arbitrum</div>
+                <div className="text-sm text-gray-400">Powered by Ethereum Sepolia</div>
               </div>
             </div>
 

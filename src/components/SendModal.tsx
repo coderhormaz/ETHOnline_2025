@@ -226,12 +226,12 @@ export function SendModal({ isOpen, onClose }: SendModalProps) {
 
                   {/* View on Explorer */}
                   <a
-                    href={`https://arbiscan.io/tx/${txHash}`}
+                    href={`https://sepolia.etherscan.io/tx/${txHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-primary-600 dark:text-primary-400 hover:underline text-sm font-medium"
                   >
-                    View on Arbiscan →
+                    View on Etherscan →
                   </a>
 
                   {/* Close Button */}

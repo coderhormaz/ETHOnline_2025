@@ -126,7 +126,7 @@ export function Security() {
                     <Shield className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                     <p className="text-sm font-semibold text-gray-900 dark:text-white">Network</p>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Arbitrum Mainnet</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Ethereum Sepolia Testnet</p>
                 </div>
               </div>
             </div>
@@ -208,7 +208,7 @@ export function Security() {
                 <div>
                   <p className="font-semibold text-gray-900 dark:text-white mb-1">Backend Security</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Your wallet is securely managed by our backend on <span className="font-semibold text-gray-900 dark:text-white">Arbitrum</span>.
+                    Your wallet is securely managed by our backend on <span className="font-semibold text-gray-900 dark:text-white">Ethereum Sepolia</span>.
                   </p>
                 </div>
               </div>

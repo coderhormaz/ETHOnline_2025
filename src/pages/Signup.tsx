@@ -418,7 +418,7 @@ export function Signup() {
           variants={fadeIn}
           className="text-center mt-8 text-xs text-gray-500 dark:text-gray-400"
         >
-          Secured by Arbitrum • Powered by PYUSD
+          Secured by Ethereum Sepolia • Powered by PYUSD
         </motion.p>
       </motion.div>
     </div>

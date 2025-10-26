@@ -406,12 +406,12 @@ export function Send() {
 
                 {/* View on Explorer */}
                 <a
-                  href={`https://arbiscan.io/tx/${txHash}`}
+                  href={`https://sepolia.etherscan.io/tx/${txHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-block text-primary-600 dark:text-primary-400 hover:underline text-sm font-medium mb-6"
                 >
-                  View on Arbiscan →
+                  View on Etherscan →
                 </a>
 
                 {/* Action Buttons */}

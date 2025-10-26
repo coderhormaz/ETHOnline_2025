@@ -25,7 +25,7 @@ export function WalletOverview() {
 
   const handleViewOnExplorer = () => {
     if (walletData?.publicAddress) {
-      window.open(`https://arbiscan.io/address/${walletData.publicAddress}`, '_blank');
+      window.open(`https://sepolia.etherscan.io/address/${walletData.publicAddress}`, '_blank');
     }
   };
 
@@ -140,7 +140,7 @@ export function WalletOverview() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl">
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Network</p>
-                  <p className="font-semibold text-gray-900 dark:text-white">Arbitrum</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">Ethereum Sepolia</p>
                 </div>
                 <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-2xl">
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Status</p>

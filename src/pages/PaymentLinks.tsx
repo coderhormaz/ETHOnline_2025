@@ -524,7 +524,7 @@ export default function PaymentLinks() {
                     <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Paid on {new Date(link.paid_at!).toLocaleString()}</p>
                     {link.tx_hash && (
                       <a
-                        href={`https://arbiscan.io/tx/${link.tx_hash}`}
+                        href={`https://sepolia.etherscan.io/tx/${link.tx_hash}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 underline"

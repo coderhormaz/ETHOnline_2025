@@ -255,7 +255,7 @@ export function Receive() {
                 ⚡ Instant Transfers
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Receive PYUSD payments instantly on Arbitrum
+                Receive PYUSD payments instantly on Ethereum Sepolia
               </p>
             </motion.div>
 

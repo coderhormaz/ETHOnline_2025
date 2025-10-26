@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { getPYUSDBalance } from '../lib/blockchain/pyusd';
+import { getPYUSDBalance, verifyPYUSDContract } from '../lib/blockchain/pyusd';
+import { getBalanceFromBlockchain } from '../services/blockchainHistory';
 import { getUserHandle } from '../services/handle';
 import { useAuth } from './AuthContext';
 
@@ -22,6 +23,15 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Verify contract on mount (only once)
+  useEffect(() => {
+    verifyPYUSDContract().then(result => {
+      if (!result.valid) {
+        console.warn('⚠️ PYUSD Contract Warning:', result.error);
+      }
+    });
+  }, []);
 
   const fetchWalletData = async () => {
     if (!user) {
