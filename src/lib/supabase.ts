@@ -30,11 +30,11 @@ export interface Transaction {
   id: string;
   from_user_id: string;
   to_user_id: string;
-  from_handle: string;
-  to_handle: string;
+  from_address: string;
+  to_address: string;
   amount: string;
   tx_hash: string;
   status: 'pending' | 'confirmed' | 'failed';
+  block_number?: number;
   created_at: string;
-  updated_at: string;
 }

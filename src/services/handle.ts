@@ -65,25 +65,52 @@ export async function checkHandleAvailability(handle: string): Promise<boolean> 
  */
 export async function resolveHandle(handle: string): Promise<string | null> {
   try {
+    // Clean and format the handle
     const formattedHandle = formatHandle(handle);
     
-    const { data, error } = await supabase
-      .from('handles')
-      .select(`
-        user_id,
-        wallets!inner(public_address)
-      `)
-      .eq('handle', formattedHandle)
-      .single();
+    console.log('🔍 Resolving handle:', formattedHandle);
     
-    if (error) {
-      console.error('Error resolving handle:', error);
+    // First, get the user_id from handles table
+    const { data: handleData, error: handleError } = await supabase
+      .from('handles')
+      .select('user_id, handle')
+      .eq('handle', formattedHandle)
+      .maybeSingle();
+    
+    if (handleError) {
+      console.error('❌ Error querying handle:', handleError);
       return null;
     }
     
-    return (data as any).wallets.public_address;
+    if (!handleData) {
+      console.error('❌ Handle not found in database:', formattedHandle);
+      return null;
+    }
+    
+    console.log('✅ Found handle:', handleData);
+    
+    // Then, get the wallet address for this user
+    const { data: walletData, error: walletError } = await supabase
+      .from('wallets')
+      .select('public_address')
+      .eq('user_id', handleData.user_id)
+      .maybeSingle();
+    
+    if (walletError) {
+      console.error('❌ Error querying wallet:', walletError);
+      return null;
+    }
+    
+    if (!walletData) {
+      console.error('❌ Wallet not found for user_id:', handleData.user_id);
+      return null;
+    }
+    
+    console.log('✅ Resolved address:', walletData.public_address);
+    return walletData.public_address;
+    
   } catch (error) {
-    console.error('Error resolving handle:', error);
+    console.error('❌ Error resolving handle:', error);
     return null;
   }
 }
@@ -108,5 +135,26 @@ export async function getUserHandle(userId: string): Promise<string | null> {
   } catch (error) {
     console.error('Error fetching user handle:', error);
     return null;
+  }
+}
+
+/**
+ * Debug function: List all handles in database
+ */
+export async function listAllHandles(): Promise<void> {
+  try {
+    const { data, error } = await supabase
+      .from('handles')
+      .select('handle, user_id')
+      .limit(100);
+    
+    if (error) {
+      console.error('Error fetching handles:', error);
+      return;
+    }
+    
+    console.log('📋 All handles in database:', data);
+  } catch (error) {
+    console.error('Error listing handles:', error);
   }
 }

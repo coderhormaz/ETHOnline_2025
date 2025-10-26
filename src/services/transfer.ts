@@ -39,28 +39,23 @@ export async function executePYUSDTransfer(
     // 5. Execute transfer
     const txHash = await transferPYUSD(wallet, toAddress, amount);
 
-    // 6. Get handles for both users
-    const fromHandle = await getUserHandle(fromUserId);
-    
-    // Get recipient user ID
+    // 6. Get recipient user ID
     const { data: recipientData } = await supabase
       .from('handles')
       .select('user_id')
       .eq('handle', toHandle)
-      .single();
+      .maybeSingle();
 
     // 7. Save transaction to database
-    if (fromHandle && recipientData) {
-      await saveTransaction({
-        from_user_id: fromUserId,
-        to_user_id: recipientData.user_id,
-        from_handle: fromHandle,
-        to_handle: toHandle,
-        amount,
-        tx_hash: txHash,
-        status: 'confirmed',
-      });
-    }
+    await saveTransaction({
+      from_user_id: fromUserId,
+      to_user_id: recipientData?.user_id || fromUserId, // Fallback to sender if recipient not found
+      from_address: walletData.public_address,
+      to_address: toAddress,
+      amount,
+      tx_hash: txHash,
+      status: 'confirmed',
+    });
 
     return { success: true, txHash };
   } catch (error) {
@@ -75,7 +70,7 @@ export async function executePYUSDTransfer(
 /**
  * Save a transaction to the database
  */
-export async function saveTransaction(transaction: Omit<Transaction, 'id' | 'created_at' | 'updated_at'>): Promise<void> {
+export async function saveTransaction(transaction: Omit<Transaction, 'id' | 'created_at'>): Promise<void> {
   try {
     const { error } = await supabase
       .from('transactions')

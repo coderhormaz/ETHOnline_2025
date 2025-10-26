@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useWallet } from '../contexts/WalletContext';
 import { executePYUSDTransfer } from '../services/transfer';
-import { resolveHandle } from '../services/handle';
+import { resolveHandle, listAllHandles } from '../services/handle';
 import { fadeIn, slideUp } from '../lib/animations';
 import { MobileNavSpacer } from '../components/MobileNav';
 import { Html5Qrcode } from 'html5-qrcode';
@@ -29,6 +29,11 @@ export function Send() {
   
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const qrReaderRef = useRef<HTMLDivElement>(null);
+
+  // Debug: List all handles on component mount
+  useEffect(() => {
+    listAllHandles();
+  }, []);
 
   // Add global styles for QR scanner
   useEffect(() => {
