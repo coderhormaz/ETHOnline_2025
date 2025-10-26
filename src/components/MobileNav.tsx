@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, Send, QrCode, Clock, Settings } from 'lucide-react';
+import { Home, Send, QrCode, TrendingUp, Settings } from 'lucide-react';
 
 interface NavItem {
   path: string;
@@ -12,8 +12,8 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: '/dashboard', icon: Home, label: 'Home' },
   { path: '/send', icon: Send, label: 'Send' },
+  { path: '/invest', icon: TrendingUp, label: 'Invest' },
   { path: '/receive', icon: QrCode, label: 'Receive' },
-  { path: '/transactions', icon: Clock, label: 'History' },
   { path: '/settings', icon: Settings, label: 'Settings' },
 ];
 

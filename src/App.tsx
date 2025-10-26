@@ -14,6 +14,8 @@ const Login = lazy(() => import('./pages/Login').then(m => ({ default: m.Login }
 const Signup = lazy(() => import('./pages/Signup').then(m => ({ default: m.Signup })));
 const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
 const Send = lazy(() => import('./pages/Send').then(m => ({ default: m.Send })));
+const Invest = lazy(() => import('./pages/Invest').then(m => ({ default: m.Invest })));
+const PortfolioDetails = lazy(() => import('./pages/PortfolioDetails').then(m => ({ default: m.PortfolioDetails })));
 const Transactions = lazy(() => import('./pages/Transactions').then(m => ({ default: m.Transactions })));
 const Receive = lazy(() => import('./pages/Receive').then(m => ({ default: m.Receive })));
 const WalletOverview = lazy(() => import('./pages/WalletOverview').then(m => ({ default: m.WalletOverview })));
@@ -60,6 +62,22 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <Send />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/invest"
+            element={
+              <ProtectedRoute>
+                <Invest />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/invest/:portfolioId"
+            element={
+              <ProtectedRoute>
+                <PortfolioDetails />
               </ProtectedRoute>
             }
           />
