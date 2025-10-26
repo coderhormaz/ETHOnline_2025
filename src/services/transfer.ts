@@ -10,7 +10,8 @@ import { resolveHandle, getUserHandle } from './handle';
 export async function executePYUSDTransfer(
   fromUserId: string,
   toHandle: string,
-  amount: string
+  amount: string,
+  note?: string
 ): Promise<{ success: boolean; txHash?: string; error?: string }> {
   try {
     // 1. Resolve recipient handle to address
