@@ -72,7 +72,8 @@ export function Signup() {
           setHandleError('Handle is already taken');
         }
       } catch (error) {
-        setHandleError('Error checking handle');
+        setHandleAvailable(null);
+        setHandleError('Unable to verify handle right now. You can still try signup.');
       } finally {
         setCheckingHandle(false);
       }
@@ -98,7 +99,11 @@ export function Signup() {
       setFormErrors(prev => ({ ...prev, password: 'Password must be at least 8 characters' }));
       hasErrors = true;
     }
-    if (!handleAvailable) {
+    const validation = validateHandle(handle);
+    if (!validation.valid) {
+      setFormErrors(prev => ({ ...prev, handle: validation.error || 'Invalid handle' }));
+      hasErrors = true;
+    } else if (handleAvailable === false) {
       setFormErrors(prev => ({ ...prev, handle: 'Please choose an available handle' }));
       hasErrors = true;
     }

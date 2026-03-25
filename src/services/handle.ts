@@ -40,23 +40,33 @@ export function formatHandle(handle: string): string {
 export async function checkHandleAvailability(handle: string): Promise<boolean> {
   try {
     const formattedHandle = formatHandle(handle);
+
+    // Primary path: backend RPC with SECURITY DEFINER avoids RLS edge-cases for signup checks.
+    const { data: rpcData, error: rpcError } = await supabase.rpc('is_handle_available', {
+      p_handle: formattedHandle,
+    });
+
+    if (!rpcError && typeof rpcData === 'boolean') {
+      return rpcData;
+    }
     
     const { data, error } = await supabase
       .from('handles')
       .select('handle')
       .eq('handle', formattedHandle)
-      .single();
+      .maybeSingle();
     
-    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+    // PGRST116 = no rows returned; treat as available.
+    if (error && error.code !== 'PGRST116') {
       console.error('Error checking handle availability:', error);
-      throw new Error('Failed to check handle availability');
+      return false;
     }
     
     // If no data found, handle is available
     return !data;
   } catch (error) {
     console.error('Error checking handle availability:', error);
-    throw error;
+    return false;
   }
 }
 
